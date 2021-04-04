@@ -1,0 +1,81 @@
+
+p {
+  text-indent: 10px;
+  margin-bottom: 10px;
+}
+
+pre {
+  margin: 0px 20px 10px;
+  padding: 10px;
+  /*
+  color: white;
+  background-color: gray;
+  */
+}
+
+
+h1 {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+h3 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+
+div.fig {
+  text-align: center;
+}
+
+div.fig p {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+p.caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+table {
+  border: solid 1px #000000;
+  border-collapse: collapse;
+  margin: 10px 20px 10px;
+}
+
+
+table th {
+  padding: 5px;
+  border: solid 1px #000000;
+}
+
+table td {
+  padding: 5px;
+  border: solid 1px #000000;
+}
+
+
+div.story {
+  margin: 0px 20px 0px;
+}
+
+div.story div {
+  margin-bottom: 10px;
+}
+
+

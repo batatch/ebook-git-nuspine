@@ -1,0 +1,1272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>4.　GitとSubversion</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c4" />
+<h1>4.　GitとSubversion</h1>
+
+
+<a name="c4-1" />
+<h2>4.1　Subversionとの連携</h2>
+
+
+<p>ナスとぱいんちゃんがプロトタイプを作っていたキャッシュサーバの開発が、
+いよいよ、社内の正式プロジェクトとして採用されることなりました。
+さて、今後の２人の活躍はどうなっていくでしょうか。。
+</p>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+先生！ minitable が正式なプロジェクトになるんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃんの頑張りが実ったわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+gitちゃんも、これからどんどん普及していくんですね！
+</div>
+
+<div>
+<b>ナス　　</b>
+あ。。それやけどな。。<br/>
+実は、うちの会社ではソース管理は Subversion を使うのが標準になってるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+えぇ、そうなんですか！？<br/>
+また、Subversionを一から覚えなきゃいけないのかぁ。。
+それにしても、じゃあなぜ今まで git使ってきたんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ああ、それは俺の個人的な趣味で。。<br/>
+なんてわけやなくて、分散管理ツールは今後どんどん普及していきそうやから、
+ぱいんちゃんには新しいものにチャレンジしてもらおう思てな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+でも、社内では使えないんですよねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ふ、ふ、ふ。。<br/>
+実は gitには Subversionしか使えん環境でもなんとかする方法があんねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なーんだ。ちゃんといい方法があるんじゃないですかぁ♪
+</div>
+
+<div>
+<b>ナス　　</b>
+git-svnゆーてな。Subversionのリポジトリと gitを連携させる機能があるんや。<br/>
+しかも、gitに標準でついてるんやで！
+</div>
+
+<div>
+<b>ぱいん　</b>
+えーっ、標準でついてるんですか。すごいですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+今は、Subversionがソース管理ツールの主流やからな。<br/>
+いきなり新しいツールへの乗り換えってのは、なかなか進まんから、
+まず、Subversionとの連携で使ってもろて、少しずつ普及を進めたいってことやないかな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど、戦略的ってことですね！<br/>
+で、その連携っていうのは、具体的にはどういうものなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+gitのリポジトリの構成の話で、プロジェクトの中心に共用のリポジトリを立てるやり方説明したやろ？<br/>
+あれの共用リポジトリの部分に Subversionのリポジトリが配置されるイメージなんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+gitのリポジトリから、Subversionのリポジトリへコミットしたりするんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+そう、そんなカンジや。<br/>
+さすが、ぱいんちゃん。ええ勘してるなぁ。
+ほな、詳しく説明していこか。
+</div>
+
+    
+<div>
+<b>ぱいん　</b>
+はい、お願いします！
+</div>
+
+<div>　</div>
+
+</div>
+
+
+
+
+<p>現行のソースコード管理システムとしてはSubversionが広く使われていています。
+なお、Subversionは SVNとも呼ばれているので、以降は SVNと表記することにします。
+</p>
+
+<p>社内でSVNが標準となっている場合もあり、その場合は gitを使いたくても使えないこともあるでしょう。
+そのような状況で便利な機能として、gitには git-svnというコマンドが用意されていています。
+このコマンドにより、gitを SVNのリポジトリに連携させることができるようになります。
+git-svnで SVNとの連携を行うときの環境は以下のようになります。
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap04.files/image002.jpg" />
+<p>図4.1　git-svnによるSVN連携の構成</p>
+</div>
+
+
+
+
+<p>SVNはひとつのリポジトリを中心に、作業者はワーキングコピーという作業領域のみをローカルに持ちます。
+</p>
+
+<p>一方、分散管理の仕組みを持つ gitでは、作業者はローカルに各自のリポジトリを持ち、
+リポジトリ間で変更点などをやりとりします。
+git-svnは、今までのように gitのリポジトリ間で変更内容をやりとりしていたところを、
+gitと SVNのリポジトリ間で操作できるようにします。
+そのため、git-svnを使った場合は、図4.1 のように、ちょうどSVNのリポジトリと作業領域の間に、
+gitのリポジトリを挟んだような構成になります。
+</p>
+
+<p>gitの SVN連携機能を使うことで、次のようなメリットが考えられます。
+</p>
+
+
+<h4>1.　プロジェクト内で SVNユーザとgitユーザの共存ができる</h4>
+
+<p>プロジェクトの共通リポジトリを SVNで構築し、gitユーザは git-svnで連携することで、
+SVNユーザと gitユーザの共存ができます。
+</p>
+
+<p>したがって、ユーザは作業のしやすいツールを自由に選択することができます。
+</p>
+
+
+<h4>2.　SVNから gitへの移行を行う</h4>
+
+<p>SVNによる既存プロジェクトを gitへ移行したい場合に、git-svnにより SVNのリポジトリを
+gitのリポジトリに変換することができます。
+</p>
+
+<p>ただし、ソースコード管理ツールを置き換えることは手間もかかり、ユーザの再教育も必要となります。
+そのような場合には、1. のように SVNと gitの共存による運用で、移行期間を設けることもできます。
+</p>
+
+
+<h4>3.　オフライン作業ができる</h4>
+
+<p>SVNでは、オフラインで共通リポジトリにアクセスできない場合は、
+ワーキングコピーに作業中ファイルを持ち続けなければいけませんでしたが、
+git-svnを使うとローカルにgitのリポジトリを持つことができるので、
+ローカルでコミットなどの作業を進めることができます。
+</p>
+
+<p>出張などの外出の際に、オフラインで作業を進められる gitのメリットが、SVNプロジェクトでもそのまま利用できます。
+</p>
+
+
+<p>　</p>
+
+<p>ここで紹介したメリットを見ると分かるように、git-svnは単に SVNから gitへの移行を助けるだけではなく、
+SVNによるプロジェクトの運用を補強するという使い方もできるのです。
+</p>
+
+<p>ここで、gitを導入するあるプロジェクトのケースを考えてみましょう。
+</p>
+
+
+<h4>第１段階</h4>
+
+<p>このプロジェクトでは SVNにより、ソースコードを管理しています。
+将来的に社内への分散ソースコード管理の導入を考えているとします。
+</p>
+
+<p>そこで、gitを使うサブチームを構成し、SVNと連携させつつ gitを習得させることを考えます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="299" src="chap04.files/image004.jpg" />
+<p>図4.2　ローカルでgitを使う例</p>
+</div>
+
+
+<p>ここでは、主にローカルでの gitの作業を習得し、gitになれていきましょう。
+</p>
+
+
+<h4>第２段階</h4>
+
+<p>このプロジェクトでは、地理的に離れたところにも作業場所があり、
+メンバはノートパソコンにソースコードをチェックアウトして、移動しているとします。
+</p>
+
+<p>移動中の作業はワーキングコピーに保持しておいて、社内に戻ったときにマージやコミットを行っています。
+</p>
+
+<div class="fig">
+<img width="566" height="236" src="chap04.files/image006.jpg" />
+<p>図4.3　移動中の作業（git導入前）</p>
+</div>
+
+
+<p>第１段階で、メンバが gitを習得すると、移動中の作業に gitのローカルリポジトリを使えるようになります。
+これで、移動中の作業はローカルに適宜コミットし、社内に戻ったら SVNのリポジトリへマージ、コミットができるようになります。
+</p>
+
+<div class="fig">
+<img width="566" height="276" src="chap04.files/image008.jpg" />
+<p>図4.4　移動中の作業（git導入後）</p>
+</div>
+
+
+<h4>第３段階</h4>
+
+<p>さらに分散管理の機能を習得するため、git同士のやりとりを使っていきましょう。
+</p>
+
+<p>SVNと連携するための gitのリポジトリをひとつだけにし、これを gitチーム用の共通リポジトリとします。
+(リポジトリＡとします)
+各メンバはリポジトリＡから git cloneによって、ローカルのリポジトリを作成します。
+SVNとの連携は、リポジトリＡの管理者がまとめてマージするといいでしょう。
+</p>
+
+<div class="fig">
+<img width="566" height="364" src="chap04.files/image010.jpg" />
+<p>図4.5　SVN連携を管理者がまとめる構成</p>
+</div>
+
+
+<p>このように、git-svnによって既存のプロジェクトへ少しずつ gitを導入していくことができます。
+また、最終的には完全に gitに移行してしまわなくても、第３段階のように中央のリポジトリはSVNのままにしておいて、
+SVNと gitの共存環境で運用するのもよいでしょう。
+</p>
+
+<p>それでは、次の節から git-svnの使い方を見ていきましょう。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c4-2" />
+<h2>4.2　リポジトリを作る</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+まずは、リポジトリを作るところからやな。<br/>
+Subversionのリポジトリを、ローカルに gitのリポジトリとして取り込むんや。
+コマンドは git svn clone を使う。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git clone の git-svn版ですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+最新の minitableのソースで Subversionのリポジトリ作っといたから、取り込んでみよか。
+
+<pre>
+$ git svn clone http://svn.server/svn/minitable
+Initialized empty Git repository in /home/pine/git/minitable/.git/
+This may take a while on large repositories
+r1 = f64d0ee70babecfbfc682fd74bd9cc3593c75b16 (git-svn)
+        A       src/minitable/Handler.java
+        A       src/minitable/MiniTable.java
+        :
+Checked out HEAD:
+  http://svn.server/svn/minitable r1
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ファイル名がぞろぞろ出てきましたね。<br/>
+この r1 = XXX っていうのは何ですか？XXXの部分は gitのコミットのハッシュ文字列みたいですけど。。
+</div>
+
+<div>
+<b>ナス　　</b>
+ええとこに気がついたな。
+右辺の XXXは gitのコミットのハッシュで正解やで。<br/>
+r1 っていうのはリビジョンの 1ってことで、Subversionはリポジトリのバージョンを番号で管理してるんやな。
+r1 = XXX は Subversionのリビジョン 1の変更を、git のコミットXXXに変換してるってことなんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+Subversionの変更履歴を gitの変更履歴として取り込んじゃうってことですか！？
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ということは、Subversionのリポジトリをそのまま全部 gitのリポジトリにコピーできちゃうんですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+変更履歴もまるごとコピーできるってことは、git svn cloneで作った gitリポジトリを新しい共用リポジトリにすれば、
+リポジトリ管理を Subversionから gitへ完全に移行させることもできるってことやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+スムーズな移行方法も用意しちゃってるなんて、gitちゃんは賢いなぁ　♪
+</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃんと一緒で優秀ってことや。<br/>
+優秀な後輩とツールに囲まれて、おれは幸せやなぁ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そんなに褒めても何もでないですよ。
+</div>
+
+<div>
+<b>ナス　　</b>
+Subversionのリポジトリと gitのコミットの関連付けができたやつは、コミットログにIDがつけられるんやで。
+
+<pre>
+$ git log
+commit ce899af0d2d9031b523310d697115302386fde45
+Author: pine &lt;pine@3cf669a8-7060-4aab-9fe4-b46c2908ef49&gt;
+Date:   Thu Jun 11 02:30:57 2009 +0000
+
+    MiniTable新規作成
+
+    git-svn-id: http://svn.server/svn/minitable@1 3cf669a8-7060-4aab-9fe4-b46c2908ef49
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+SubversionのリポジトリURLの後ろの @1っていうのが、Subversionのリビジョン番号で、
+gitのコミットがどのリビジョンに対応してるのか分かるようになってんねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？よく見たら、このログ、今まで gitで作業していたログと同じじゃないですか？<br/>
+Subversionには最新のソースを登録したんじゃないんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ふふふ。git-svn使こたら 応用で gitのリポジトリを逆にSubversionに登録することもできるっちゅーこっちゃ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そんなこともできるんですか！？さすがナス先生！
+</div>
+
+<div>
+<b>ナス　　</b>
+先生かぁ。。なんど聞いてもええ気分やなぁ。。よし、ぱいんちゃんにコーヒーでもおごったろ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+やったぁ♪ (うーん、単純だわぁ)
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="421" src="chap04.files/image012.png" />
+</div>
+
+
+<h4>git svn clone</h4>
+
+
+<p>すでにある SVNのリポジトリから、gitのリポジトリを作成することができます。
+
+<pre>
+git svn clone &lt;リポジトリ&gt; [ディレクトリ]
+</pre>
+</p>
+
+<p>git cloneの git-svn版といえますね。
+</p>
+
+<p>たとえば、http://svn.server/svn/project1/trunk に SVNのリポジトリがある場合には、以下のように指定します。
+
+<pre>
+git svn clone http://svn.server/svn/project1/trunk project1
+</pre>
+</p>
+
+<p>project1ディレクトリが作られ、その下に SVNの trunkから取得した作業ファイルと、gitのリポジトリが作られます。
+</p>
+
+<p>また、SVNでは通例として trunk、branches、tagsというディレクトリを作り、
+それぞれ現行のコード、ブランチ、タグのコードを作成するのですが、
+これらを gitのブランチやタグに関連付けることもできます。
+
+<pre>
+git svn clone -s http://svn.server/svn/project1
+</pre>
+</p>
+
+<p>SVNのトランクやブランチが標準の構成でない場合は、個別に指定することもできます。
+(トランクがmain、ブランチがbranh、タグがtagディレクトリの場合)
+
+<pre>
+git svn clone -T main -b branch -t tag http://svn.server/svn/project1
+</pre>
+</p>
+
+<p>git-svnで関連づけられた SVNのブランチやタグは、gitのリモートブランチとして取り込まれ、
+デフォルトで、リモートブランチの trunkに対するローカルブランチとしてmasterが作られます。
+</p>
+
+<h5>ローカルブランチ</h5>
+<p>
+<pre>
+$ git branch
+* master
+</pre>
+</p>
+
+<h5>リモートブランチ</h5>
+<p>
+<pre>
+$ git branch -r
+stable
+tags/v0.1
+tags/v0.2
+trunk
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="564" height="307" src="chap04.files/image014.png" />
+<p>図4.6　SVNリポジトリの取り込み</p>
+</div>
+
+
+<p>SVNのトランクのみを取得した場合は、リモートブランチ git-svnが作られ、
+git-svnに対するローカルブランチとして masterが作られます。
+</p>
+
+
+<div class="fig">
+<img width="545" height="310" src="chap04.files/image016.png" />
+<p>図4.7　SVNリポジトリの取り込み(トランクのみ)</p>
+</div>
+
+
+<p>なお、SVNのタグとブランチの違いはとくになく(単なるファイルのコピーなので)、
+gitのタグとは概念が違うため、gitに取り込むときにはブランチとして取り込まれます。
+</p>
+
+<p>ただし、このままではSVNのブランチはリモートブランチとして取り込まれているので、
+ブランチを切り替えても参照のみとなります。
+
+<pre>
+$ git checkout tags/v0.1
+Note: moving to "tags/v0.1" which isn't a local branch
+If you want to create a new branch from this checkout, you may do so
+(now or later) by using -b with the checkout command again. Example:
+  git checkout -b &lt;new_branch_name&gt;
+HEAD is now at f9e6e96... tag v0.1
+
+$ git branch
+* (no branch)  # どこのブランチにもいない
+  master
+</pre>
+</p>
+
+<p>SVNのブランチに対して修正などの作業を行う場合には、
+SVNのブランチのリモートブランチに対するローカルブランチを作成して、作業することになります。
+これについては、「4.5節」で説明します。
+git svn clone のオプションについては「6章」を参照して下さい。
+</p>
+
+
+<h4>git svn init、git svn fetch</h4>
+
+<p>git svn cloneでは、gitのリポジトリを作成し、SVNのリビジョン(=gitのコミット)の取得まで行いましたが、
+リポジトリを作成のみを行う git svn initコマンドもあります。
+
+<pre>
+git svn init &lt;リポジトリ&gt; [ディレクトリ]
+</pre>
+</p>
+
+<p>トランクやブランチ指定などのオプションも git svn cloneと同様です。
+</p>
+
+<p>git svn initでは、SVNのリポジトリに関連づけて gitのリポジトリを作成するだけで、
+作業ファイルや、リモートブランチなどはまだ作られません。
+</p>
+
+<p>SVNのリビジョンを取得するには、git svn initの後に、git svn fetch を実行します。
+これは、SVNのトランク、ブランチ、タグに対応するリモートブランチを作成し、
+SVNのリビジョンを gitのコミットに変換してダウンロードします。
+
+<pre>
+git svn fetch
+</pre>
+</p>
+
+<p>git svn cloneは、git svn initと git svn fetchをまとめたコマンドといえます。
+</p>
+
+<p>git svn init、git svn fetchのオプションについては「6章」を参照して下さい。
+ただし、cloneは init、fetchのオプションの両方のオプションを受け付けるので、オプションの意味は cloneと同様となります。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c4-3" />
+<h2>4.3　変更を取り込む</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+git同士の場合は、他の人の変更が共用リポジトリに反映されてたら、
+git pullでローカルのリポジトリへ取り込んでたけど、これに対応するのが git svn rebase やねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+お、いきなりですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+先手必勝、一撃必殺や。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんのことですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+Subversionのリポジトリに変更が入ってるはずやから、取り込んでみよか。
+
+<pre>
+$ git svn rebase
+MiniTable.java: needs update
+update-index --refresh: command returned error: 1
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？なんかエラーになってますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+git svn rebaseは、作業ツリーにコミットしてない変更があるとエラーになんねん。<br/>
+いま、MiniTable.java変更中なんちゃうの？
+</div>
+
+<div>
+<b>ぱいん　</b>
+変更しようかなぁと思ってたんですけど、ほとんど触ってないので元に戻しちゃいますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+大して変更してなかったら戻してもええけど、編集が進んでたら git stashで編集中の内容を退避させる方法もあるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、そうでしたね。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、もう一回 git svn rebaseやってみよか。
+
+<pre>
+$ git svn rebase
+        M       src/minitable/MiniTable.java
+r2 = 8a6a49f8f43382f76da67379e22e80c23cc057a2 (git-svn)
+First, rewinding head to replay your work on top of it...
+Fast-forwarded master to refs/remotes/git-svn.
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+MiniTable.javaに更新があったってことですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうや。<br/>
+r2 = XXXってあるから、Subversionのリビジョン 2の変更を取り込んだってことになるな。
+git log で見てみたら、ちゃんと履歴が変換されてるのが分かるで。
+
+<pre>
+$ git log
+commit 0fcda7b52a568a03fc90a34ba80c3d4d34c2c89e
+Author: nus &lt;nus@8f3de871-8140-3dd2-843a-b46c2908ef49&gt;
+Date:   Fri Jun 12 11:01:23 2009 +0000
+
+    SET時の不具合修正
+
+    git-svn-id: http://svn.server/svn/minitable@2 8f3de871-8140-3dd2-843a-b46c2908ef49
+
+commit ce899af0d2d9031b523310d697115302386fde45
+Author: pine &lt;pine@3cf669a8-7060-4aab-9fe4-b46c2908ef49&gt;
+Date:   Thu Jun 11 02:30:57 2009 +0000
+
+    MiniTable新規作成
+
+    git-svn-id: http://svn.server/svn/minitable@1 3cf669a8-7060-4aab-9fe4-b46c2908ef49
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ほんとだ。追加されたログは、ちゃんとリビジョン 2になってますね♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="418" src="chap04.files/image018.png" />
+</div>
+
+
+<h4>git svn rebase</h4>
+
+
+<p>SVNのリポジトリの更新をダウンロードするには git svn rebaseを使います。
+
+<pre>
+git svn rebase
+</pre>
+</p>
+
+<p>作業ツリーに編集途中のファイルがあると、コマンドがエラーになるので、
+すべての変更をgitのリポジトリにコミットするか、git stash で編集途中のファイルを退避させ、
+作業ツリーをクリーンな状態にしてから実行します。
+</p>
+
+<p>git svn rebaseは、SVNのリビジョンをダウンロードしてリモートブランチを更新し、
+ローカルブランチに反映されているリビジョン以降の変更を取り込みます。
+</p>
+
+<p>gitのコミットログ上は、SVNに反映済みのコミットと、それ以降のローカルのコミット(SVNに反映していないもの)の間に、
+新しくダウンロードしたリビジョンのコミットが追加されます。
+</p>
+
+<p>ちょうど、git svn fetch と git rebase を合わせた処理になります。
+
+<pre>
+$ git svn rebase
+        M       MiniTable.java
+r3 = c7a8fb00edd51e418fcaff4c22073cb8fdedfec7 (trunk)
+        M       MiniTable.java
+r4 = 0912b683b141a8b1f31db7fb7e1183a14ee67062 (trunk)
+First, rewinding head to replay your work on top of it...  # ここまででSVNのリビジョンを取り込み
+Applying: 変更1  # SVNの最新リビジョン後に gitのコミットを適用していく
+Applying: 変更2
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap04.files/image020.png" />
+<p>図4.8　git svn rebase の取り込みとコミットログの更新</p>
+</div>
+
+
+<p>ダウンロードしたSVNの更新と、gitのコミットの変更部分がかぶっていた場合はコンフリクトになります。
+</p>
+
+<p>エラーメッセージに表示される操作にしたがって、処理を続けます。
+
+<pre>
+エラーの場合
+$ git svn rebase
+        M       MiniTable.java
+r3 = c7a8fb00edd51e418fcaff4c22073cb8fdedfec7 (trunk)
+        M       MiniTable.java
+r4 = 0912b683b141a8b1f31db7fb7e1183a14ee67062 (trunk)
+First, rewinding head to replay your work on top of it...
+Applying: 変更1
+error: patch failed: MiniTable.java:1
+error: MiniTable.java: patch does not apply
+Using index info to reconstruct a base tree...
+Falling back to patching base and 3-way merge...
+Auto-merging MiniTable.java
+CONFLICT (content): Merge conflict in MiniTable.java  # マージでコンフリクトを検出
+Failed to merge in the changes.
+Patch failed at 0002.
+
+When you have resolved this problem run "git rebase --continue".            # コンフリクトを解消して続ける場合
+If you would prefer to skip this patch, instead run "git rebase --skip".    # このコミットをスキップする場合
+To restore the original branch and stop rebasing run "git rebase --abort".  # git svn rebaseの処理を取り消す場合
+</pre>
+</p>
+
+
+<p>コンフリクトを解消して続ける場合は、まず、コンフリクト部分を修正します。
+ファイルをしたら、git add でインデックスに登録し、git rebase --continueを実行すると、マージの作業が再開します。
+</p>
+
+<pre>
+$ (コンフリクトを修正)
+$ git add -u
+$ git rebase --continue
+Applying: 変更1  # コンフリクトが解消される
+Applying: 変更2
+</pre>
+
+
+<div class="fig">
+<img width="566" height="343" src="chap04.files/image022.jpg" />
+<p>図4.9　コンフリクトを解消してマージを続ける</p>
+</div>
+
+
+<p>コミットをスキップする場合は、git rebase --skipとすることで、現在のコミットを破棄し、
+次のコミットのマージへ進みます。
+
+<pre>
+$ git rebase --skip
+HEAD is now at 0912b68 Update new version.
+Applying: 変更2  # 「変更1」のマージを破棄して、「変更2」を最新のコミットへマージ
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="358" src="chap04.files/image024.jpg" />
+<p>図4.10　コンフリクトのコミットをスキップする</p>
+</div>
+
+
+<p>git svn rebaseの処理を取り消す場合は git rebase --abortとします。
+</p>
+
+<p>これにより、SVNから取り込んだリビジョンの反映分も破棄されます。
+
+<pre>
+$ git rebase --abort
+HEAD is now at 6dd8772 変更2  SVNのリビジョン取り込み前の状態に戻る
+</pre>
+</p>
+
+<p>git svn rebase のオプションについては「6章」を参照して下さい。
+</p>
+
+
+<p>git svn rebaseを実行すると、SVNの最新リビジョンまでマージしてしまいますが、
+SVNのあるリビジョンまでをマージしたいというときには、git svn fetchと git svn rebase -lを使う方法があります。
+</p>
+
+<p>たとえば、ローカルに取り込み済みのリビジョンが2で、SVNの最新リビジョンが10として、
+リビジョン4までをマージしたい場合は、次のようにします。
+
+<pre>
+$ git svn fetch -r 2:4  # 現在のリビジョン2で、リビジョン4までを取り込む場合
+$ git svn rebase -l     # リモートリポジトリからマージ
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="416" src="chap04.files/image026.jpg" />
+<p>図4.11　SVNの途中のリビジョンまでマージする</p>
+</div>
+
+
+<p>SVNからの変更が多い場合に、少しずつ反映させることができます。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c4-4" />
+<h2>4.4　変更を反映する</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+ローカルで変更したファイルは gitのコミットしてるんですけど、
+Subversionへは反映できないんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+もちろん、反映できるで。<br/>
+ほな、Subversionへの反映やってみよか。
+使うコマンドは git svn dcommitや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+dってなんだろ？
+</div>
+
+<div>
+<b>ナス　　</b>
+なんやろなぁ？
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？(笑
+</div>
+
+<div>
+<b>ナス　　</b>
+git svn dcommitは、Subversionと gitのリポジトリを比較して、Subversionに登録されていないコミットを反映する。<br/>
+リポジトリ同士の差分を反映するから「diff」の dかもな。
+Subversionのリビジョンの取り込みのときと同じで、gitのコミットごとに Subversionのリビジョンが作られるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+gitのリポジトリへコミットした内容が、そのままSubversionのリポジトリへ反映されるんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやで。<br/>
+ちなみに、git svn dcommitする前に、ちゃんと git svn rebaseしとかなあかんで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+rebaseしないと、どこまで Subversionに反映されてるか分からないですもんね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。さすがぱいんちゃん♪<br/>
+あと、git svn dcommitは今のブランチのみ反映するよって、複数のブランチを同時に更新することはできへんで。
+あんまりやりたいと思うことないやろけどな。<br/>
+それから、作業ツリーに作業ファイルが残っててもエラーになるで。
+
+<pre>
+$ git svn dcommit
+Cannot dcommit with a dirty index.  Commit your changes first, or stash them with `git stash'.
+  at /usr/sbin/git-core//git-svn line 431
+</pre>
+
+こういうときは、エラーメッセージにあるように、git stashで変更を退避させといたらええねん。
+
+<pre>
+$ git stash
+$ git svn dcommit
+$ git stash apply
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+git stashも併用できるんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+説明はこれくらいにして、dcommitしてみよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。git svn dcommitと。。
+
+<pre>
+$ git svn dcommit
+Committing to http://svn.server/svn/project1/trunk ...
+        M       MiniTable.java
+Committed r3
+        M       MiniTable.java
+r3 = e2087eb3...07036083 (trunk)
+No changes between current HEAD and refs/remotes/trunk
+Resetting to the latest refs/remotes/trunk
+        M       MiniTable.java
+        M       Handler.java
+Committed r4
+        M       MiniTable.java
+        M       Handler.java
+r4 = 15fc7000...13eb3494 (trunk)
+No changes between current HEAD and refs/remotes/trunk
+Resetting to the latest refs/remotes/trunk
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+dcommitのあとにちゃんと git svn rebaseしてくれるから、git logで見たらちゃんとgit-svn-id設定されるんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ほんとだ。ちゃんと反映されてますね♪
+<pre>
+$ git log
+commit 15fc7000...13eb3494
+Author: pine &lt;pine@cd44e0b0-xxxx-xxxx-xxxx-897c9e9f89d8&gt;
+Date:   Mon Aug 3 11:26:26 2009 +0000
+
+    MiniTableとHandlerの修正
+
+    git-svn-id: http://svn.server/svn/project1/trunk@4 cd44e0b0-xxxx-xxxx-xxxx-897c9e9f89d
+</pre>
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="422" src="chap04.files/image028.png" />
+</div>
+
+
+<p>ローカルの gitでの変更を SVNへ反映させるには git svn dcommitを使います。
+
+<pre>
+git svn dcommit
+</pre>
+</p>
+
+<p>dcommitは gitと SVNのリポジトリを比較して、SVNのリポジトリに反映されていない gitのコミットを
+反映するので、あらかじめ以下の準備をしておかなければいけません。
+</p>
+
+<ul>
+<li>作業ツリーの変更は gitにコミットしておく</li>
+<li>dcommitの前に、git svn rebaseで SVNの最新リビジョンを取得しておく</li>
+</ul>
+
+<p>git svn rebaseをすると、SVNの最新リビジョンをダウンロードし、ローカルでの変更は
+最新リビジョンの後に追加された状態になるので、git-svnは安全に SVNへ変更を反映することができます。
+
+<pre>
+$ git svn dcommit
+Committing to http://svn.server/svn/project1/trunk ...
+        M       MiniTable.java
+Committed r3
+        M       MiniTable.java
+r3 = e2087eb3...07036083 (trunk)
+No changes between current HEAD and refs/remotes/trunk
+Resetting to the latest refs/remotes/trunk
+        M       MiniTable.java
+        M       Handler.java
+Committed r4
+        M       MiniTable.java
+        M       Handler.java
+r4 = 15fc7000...13eb3494 (trunk)
+No changes between current HEAD and refs/remotes/trunk
+Resetting to the latest refs/remotes/trunk
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap04.files/image030.png" />
+<p>図4.12　git svn dcommitによるコミットの反映</p>
+</div>
+
+
+<p>また、作業ツリーの変更がまだ途中でコミットできない場合は、ナスくんのように git stashで
+変更を一時的に退避しておくといいでしょう。
+
+<pre>
+$ git svn dcommit
+Cannot dcommit with a dirty index.  Commit your changes first, or stash them with `git stash'.
+ at /usr/sbin/git-core//git-svn line 431
+
+$ git stash
+$ git svn dcommit
+$ git stash apply     # dcommit後に stashを元に戻して、作業を続ける
+</pre>
+</p>
+
+<p>なお、git svn dcommitは現在のブランチ、つまりここではローカルの masterブランチの変更を、
+対応するリモートの trunkに反映します。
+SVNの他のブランチやタグに反映する場合は、ブランチやタグを参照するローカルブランチを作成し、
+そのブランチに切り替えて git svn dcommitします。
+
+<pre>
+$ git branch -r
+stable
+tags/v0.1
+trunk
+
+$ git branch l_stable stable  # SVNのブランチ(stable)に対応するローカルブランチを作成(l_stable)
+$ git checkout l_stable
+
+$ ～変更～
+$ git commit                  # ローカルブランチ(l_stable)へコミット
+$ git svn dcommit             # SVNのブランチ(stable)へ反映
+</pre>
+</p>
+
+<p>git svn dcommit のオプションについては「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c4-5" />
+<h2>4.5　ブランチ、タグ</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+先生！今度、このバージョンでデモリリースすることになったので、タグを切っておきたいんですけど、
+Subversionで作るしかないのかなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+もちろん、git-svnで Subversionのブランチやタグも作れるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+よっ、待ってました！
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、今回はブランチ、タグの作成やな。<br/>
+使うコマンドは git svn branch と git svn tagや。
+trunkからタグを作るんやったら、ブランチを masterにしておいて、git svn tag &lt;tagname&gt; ってやればＯＫや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git svn tag。。。と、
+
+<pre>
+$ git checkout master
+$ git svn tag v0.3
+Copying http://svn.server/svn/project1/trunk at r9 to http://svn.server/svn/project1/tags/v0.3...
+Found possible branch point: http://svn.server/svn/project1/trunk =&gt; http://svn.server/svn/project1/tags/v0.3, 9
+Found branch parent: (tags/v0.3) 15fc7000...13eb3494
+Following parent with do_switch
+Successfully followed parent
+r12 = e509158a...2cd2db50 (tags/v0.3)
+</pre>
+
+えーと、なんかできたみたいですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+うん、ちゃんとできてるな。<br/>
+Copying...の行を見たら、trunkのリビジョン9 を元に tags/ の下に v0.3のタグにコピーを作ってるのが分かるやろ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですね。<br/>
+最後の r12というのは、タグの追加のリビジョンってことですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。<br/>
+んで、タグを作ったら、gitのリモートブランチにも、新しいタグが追加されてるのが分かるで。
+
+<pre>
+$ git branch -r
+  stable
+  tags/v0.1
+  tags/v0.3    # 追加されたタグ
+  trunk
+</pre>
+
+Subversionのタグは gitのタグとは違て、コピー作ってるだけやから、ブランチの作成もだいたい一緒やで。<br/>
+git svn branch &lt;branchname&gt; でＯＫ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほどぉ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ちなみに、リモートブランチは直接チェックアウトできへんから、ブランチで作業するときは、
+リモートブランチを元にローカルブランチを作らなあかんねん。
+
+<pre>
+$ git branch -r
+stable
+  :
+$ git branch l_stable stable  # stableに対するローカルブランチを作成
+$ git checkout l_stable       # ローカルブランチをチェックアウト
+$ git branch
+* l_stable
+  master
+</pre>
+
+これで、l_stableに変更をコミットして、git svn dcommitしたら、Subversionのstableブランチに反映されるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+分かりました！これでブランチやタグもばっちりですね♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="421" src="chap04.files/image032.png" />
+</div>
+
+
+<p>git-svn では SVNのブランチやタグを参照するだけでなく、git側から SVNへブランチやタグを作ることもできます。
+
+<pre>
+git svn branch &lt;branchname&gt;
+git svn tag &lt;tagname&gt;
+</pre>
+</p>
+
+<p>gitでは、タグはあるコミットに名前をつけるもので、ブランチとは別物でしたが、SVNのブランチやタグは、
+作成元のツリーのコピーを作るだけなので、ブランチとタグに大きな違いはありません。
+
+<pre>
+$ git svn branch stable
+Copying http://svn.server/svn/project1/trunk at r10 to http://svn.server/svn/project1/branches/stable...
+Found possible branch point: http://svn.server/svn/project1/trunk => http://svn.server/svn/project1/branches/stable, 10
+Found branch parent: (stable) b032374d...143b456f
+
+Following parent with do_switch
+Successfully followed parent
+r11 = e2adbfeb...a975b744 (stable)
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="331" src="chap04.files/image034.jpg" />
+<p>図4.13　git-svnによる SVNのブランチ作成</p>
+</div>
+
+
+<p>git svn branch でブランチを作成したら、リモートブランチが作成されますが、
+リモートブランチは直接チェックアウトできないため、作業用にローカルブランチを作成する必要があります。
+
+<pre>
+$ git branch -r
+  stable
+  tags/v0.1
+  trunk
+
+$ git branch l_stable stable  # リモートブランチ(stable)を元にローカルブランチ(l_stable)を作成
+$ git checkout l_stable       # ローカルブランチに切り替えて作業する
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="357" src="chap04.files/image036.jpg" />
+<p>図4.14　リモートブランチを元にローカルブランチを作成</p>
+</div>
+
+
+<p>ローカルブランチで通常通り変更をコミットして、git svn dcommitすれば SVNのブランチに変更が反映されます。
+ブランチでの作業が終わったら、ローカルブランチを削除してもかまいません。
+
+<pre>
+$ git branch -d l_stable
+</pre>
+</p>
+
+<p>git svn branch と git svn tag のオプションについては「6章」を参照して下さい。
+</p>
+
+
+</body>
+
+</html>

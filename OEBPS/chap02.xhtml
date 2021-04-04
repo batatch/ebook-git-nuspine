@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>2.　Git の導入</title>
+<style type="text/css">
+</style>
+</head>
+
+<body>
+
+<a name="c2" />
+<h1>2.　Git の導入</h1>
+
+<a name="c2-1" />
+<h2>2.1　インストール</h2>
+
+<p>さっそく、git をインストールしてみましょう。
+</p>
+
+<p>git は Linux、Windows、MacOS など、多くの OS環境で利用できますが、後述するように現時点ではパッケージなどが十分に整理されていないことがあります。
+したがって、Linux や MacOSX などの UNIX ベースの環境で最新バージョンの git を利用するには、ソースコードからのインストールをお勧めします。
+</p>
+
+<p>git のダウンロード情報は以下のサイトにまとめられていて、執筆時点の最新バージョンは 1.7.4 となっています。
+</p>
+
+<p><a href="http://git-scm.com/download">http://git-scm.com/download</a></p>
+
+<p>ダウンロードのサイトにあるリンクから、ソースコードをダウンロードし、ビルドします。
+</p>
+
+<p>ソースをダウンロード</p>
+
+<pre>
+$ wget http://kernel.org/pub/software/scm/git/git-1.7.X.Y.tar.gz
+</pre>
+
+<p>ファイルを展開</p>
+
+<pre>
+$ tar zxf git-1.7.X.Y.tar.gz
+$ cd git-1.7.X.Y/
+</pre>
+
+<p>ビルドしてインストール</p>
+
+<pre>
+$ ./configure
+$ make
+$ sudo make install　　# rootでインストール
+</pre>
+
+<p>上記の手順ではデフォルトで usr/local/ の下に git がインストールされます(usr/local/bin/git)。
+</p>
+
+<p>システムの共通ツールとしてインストール(usr/bin/git として)、
+個人用に HOMEディレクトリにインストール(/home/{ユーザ名}/bin/git として)したい場合は、
+configure の --prefix オプションで指定することができます。
+</p>
+
+<p>システムの共通インストールの場合</p>
+
+<pre>
+$ ./configure --prefix=/usr
+</pre>
+
+<p>ユーザ(user)の HOME ディレクトリにインストールする場合</p>
+
+<pre>
+$ ./configure --prefix=/home/user
+$ make install　　# HOME ディレクトリにインストールする場合は root でインストールしなくてよい
+</pre>
+
+<p>また、git はいくつかの外部プログラムを必要とするため、ビルドでエラーになった場合は以下のプログラムがあるか確認しましょう。
+</p>
+
+<ul>
+<li>zlib</li>
+<li>openssl</li>
+<li>perl</li>
+<li>ssh　　# ネットワーク経由で他のリポジトリと通信する場合に必要(optional)
+</li>
+<li>libcurl　　# HTTP によるリポジトリアクセスする場合に必要(optional)
+</li>
+<li>expat　　# WebDAV によるリポジトリアクセスする場合に必要(optional)
+</li>
+<li>wish　　# GUIツール(gitk)を利用する場合に必要(optional)
+</li>
+</ul>
+
+
+<h4>Linnuxの場合</h4>
+
+<p>Linuxにインストールする場合は、使用しているディストリビューションによって、パッケージとして提供されているものもあります。
+</p>
+
+<p>RedHat、CentOS、FedraCoreなど
+<pre>
+$ sudo yum install git-core
+</pre>
+</p>
+
+<p>Debian、Ubuntuなど
+<pre>
+$ sudo apt-get install git-core
+</pre>
+</p>
+
+
+<h4>MacOS X の場合</h4>
+
+<p>MacOS X で git を利用するには、Git for OS X というパッケージを利用する方法と、MacPorts を利用する方法があります。
+</p>
+
+<h5>Git for OS Xの利用</h5>
+
+<p>Git for OS X は MacOS 10.5(Leopard) 向けのみ公開されています。
+</p>
+
+<p>以下のサイトからパッケージ(git-1.X.X-i386-leopard.dmg)をダウンロードします。
+</p>
+
+<p><a href="http://code.google.com/p/git-osx-installer/">http://code.google.com/p/git-osx-installer/</a></p>
+
+<p>git-1.X.X-i386-leopard.dmg をダブルクリックで展開すると、git-1.X.X-i386-leopard.pkg というファイルができるので、
+これをダブルクリックし、メニューにしたがってインストールします。
+</p>
+
+<div class="fig">
+<img src="chap02.files/image002.png" />
+<p>図2.1　Git for OS X のインストール画面</p>
+</div>
+
+<p>Git for OS X はデフォルトで /usr/local/git 以下に git をインストールします。
+gitのコマンドは /usr/local/git/bin/git となります。
+</p>
+
+
+<h5>MacPorts の利用</h5>
+
+<p>MacPorts 環境を利用している場合は、git のパッケージをインストールすることができます。
+</p>
+
+<pre>
+$ sudo port install git-core
+</pre>
+
+<p>Git for OS X、MacPorts とも利用できない場合は、ソースコードからのインストールの手順でインストールすることができます。
+</p>
+
+
+<h4>Windows の場合</h4>
+
+<p>Windows で git を利用するには、Windowsで UNIX のコマンドなどの環境を実現する Cygwin 上で利用する方法と、
+msysGit というパッケージを利用する方法があります。
+</p>
+
+
+<h5>Cygwin での利用</h5>
+
+<p>Cygwin は UNIX のアプリケーションをパッケージとして提供します。
+インストールするには、以下のサイトから setup.exe をダウンロードします。
+</p>
+
+<p><a href="http://www.cygwin.com/setup.exe">http://www.cygwin.com/setup.exe</a></p>
+
+<p>setup.exeを実行し、「次へ」をクリックしてインストールを進めましょう。</p>
+
+<div class="fig">
+<img width="516" height="344" src="chap02.files/image003.png" />
+<p>図2.2　setup.exe の実行画面</p>
+</div>
+
+
+<p>「Choose A Download Source」では、「Install from Internet」にチェックを入れます。
+</p>
+
+<p>「Select Root Install Directory」は、Cygwinのインストール先のフォルダを指定します。
+Cygwinの環境はここで指定したフォルダ以下に構築されます。ここでは「C:\cygwin」とします。
+Install Forは「All User」でいいでしょう。
+Default Text File Typeは必ず「Unix / binary」をチェックしてください。
+そうしないと gitが正しく動作しません。
+</p>
+
+<p>「Select Local Package Directory」では、パッケージのダウンロード先のフォルダを指定します。
+ここでは「C:\cygwin\download」とします。
+</p>
+
+<p>「Select Your Internet Connection」は、インターネットへの接続方法を指定します。
+</p>
+
+<p>「Choose A Download Site」は、Cygwinのパッケージのミラーサイトからダウンロードするサイトを選択します。
+</p>
+
+<p>「Select Packages」で、インストールするパッケージを選択します。
+gitのパッケージは「Devel」カテゴリに含まれています。
+gitを利用するために必要な他のパッケージも合わせて選択します。
+</p>
+
+<ul>
+<li>Develカテゴリ</li>
+  <ul>
+  <li>"git Fast Version Control System"</li>
+  </ul>
+<li>Netカテゴリ</li>
+  <ul>
+  <li>"openssh"</li>
+  </ul>
+<li>Libsカテゴリ</li>
+  <ul>
+  <li>"tcltk"</li>
+  <li>"subversion-perl"  # 4章で紹介する Subversion連携機能を利用する場合パッケージを選択して「次へ」をクリックすると、パッケージのダウンロード、インストールが始まります。</li>
+  </ul>
+</ul>
+
+<p>最後に「Create Icons」で「完了」をクリックすれば、Cygwinのインストールが完了します。
+後からパッケージを追加、更新する場合は setup.exeを実行し、「Select Packages」画面でパッケージを選択しなおせばＯＫです。
+</p>
+
+<p>Cygwinを実行するには「スタート」ボタンから、「すべてのプログラム」→「Cygwin」→「Cygwin Bash Shell」を選択します。
+Bashのコマンドプロンプト画面が開き、コマンド入力待ちとなります。
+</p>
+
+<div class="fig">
+<img width="566" height="413" src="chap02.files/image005.jpg" />
+<p>図2.3　Cygwin(Bash)の実行画面</p>
+</div>
+
+
+<p>デフォルトでは Windowsのコマンドプロンプトとなりますが、より高機能な端末エミュレータを利用するのがよいでしょう。
+Poderosa(ポデローサ)というツールは、Cygwinへの接続も可能で、複数端末をタブで扱えたり、表示する文字コードを選択できるので便利です。
+</p>
+
+<p>Poderosa　<a href="http://ja.poderosa.org/">http://ja.poderosa.org/</a></p>
+
+<div class="fig">
+<img width="566" height="413" src="chap02.files/image007.jpg" />
+<p>図2.4　Poderosaの画面イメージ</p>
+</div>
+
+
+<h5>msysGitでの利用</h5>
+
+<p>msysGitは gitと Bashなどのいくつかの UNIXコマンドをまとめた Windows用の gitパッケージです。
+</p>
+
+<p><a href="http://code.google.com/p/msysgit/">http://code.google.com/p/msysgit/</a></p>
+
+<p>上記のサイトから Git-1.X.Y-preview20XXXXXX.exe をダウンロードし、メニューにしたがってインストールします。
+msysGitはデフォルトでは「C:\Program Files\Git」にインストールされ、Cygwinと共存することもできます。
+</p>
+
+<div class="fig">
+<img width="503" height="392" src="chap02.files/image008.png" />
+<p>図2.5　msysGitのインストール画面</p>
+</div>
+
+
+<p>「スタート」ボタンから、「すべてのプログラム」→「Git」→「Git Bash」を実行することで、Bashのコマンドプロンプトが表示されます。
+</p>
+
+<div class="fig">
+<img width="566" height="328" src="chap02.files/image010.jpg" />
+<p>図2.6　msysGitのBashの実行画面</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c2-2" />
+<h2>2.2　Gitの世界</h2>
+
+<p>gitをインストールしたら、さっそく使っていきたいところですが、まず gitの環境について説明します。
+</p>
+
+<p>ここからは、みなさんと一緒に gitを学んでいく２人を紹介しましょう。
+開発会社のとある部署に新しく配属になった「ぱいんちゃん」と、教育係りに任命された部署のエース？の「ナスくん」です。
+</p>
+
+
+<div class="story">
+<div>　</div>
+
+<div>
+<b>ぱいん　</b>
+これからお世話になる「ぱいん」です。よろしくお願いします！
+</div>
+
+<div>
+<b>ナス　　</b>
+元気がええなぁ。こちらこそ、よろしくな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ナス先輩は部署のエースなんですよね！ビシバシ指導して下さいね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+なんやエースって。また aoyama課長が調子ええことゆうたんやな。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+最初やから、まずは開発に使うツールの使い方覚えてもらうで。
+git(ぎっと)ゆうて、ファイルのバージョン管理するツールなんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+バージョン管理ってなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+まあ、バージョン管理の基本については「1章」見てや。
+ツールのインストール方法は「2.1節」にあるよってな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんだか、紙面の都合っぽいですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+gitはいろいろなコマンドがあるんやけど、コマンドの説明はじめる前に環境について説明しとくな。
+「Gitの世界」へようこそやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい、よろしくお願いします！
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>gitの環境はいくつかの領域で構成されていて、gitのコマンドはそれらの領域に作用するものと考えられます。
+gitには多数のコマンドがあり、主要なものでも２０程度にもなりますが、領域への作用で考えるとそれらの作用の組み合わせとしてとらえることができます。
+</p>
+
+<p>以下は gitの環境の全体図を表したものです。</p>
+
+<div class="fig">
+<img width="566" height="421" src="chap02.files/image012.png" />
+<p>図2.7　git環境の全体図</p>
+</div>
+
+
+<p>図中の各領域について以下に説明します。
+</p>
+
+
+<mbp:pagebreak />
+
+<h4>(1) リポジトリ</h4>
+
+<p>ファイルの変更履歴(コミット)を体系立てて管理するデータベース。
+</p>
+
+<p>変更履歴を管理することにより、管理対象のファイルツリーを時点で参照したり、変更差分を参照できるようになります。
+リポジトリ作成コマンドで作られる管理ディレクトリ(.git)の中に作られます。「3.1節」参照)
+</p>
+
+<p>なお、.gitディレクトリにはリポジトリの他にインデックスや stashも含まれます。
+</p>
+
+<div class="fig">
+<img width="566" height="303" src="chap02.files/image014.jpg" />
+<p>図2.8　リポジトリにおける履歴管理のイメージ</p>
+</div>
+
+
+<h4>(2) 作業ツリー</h4>
+
+<p>リポジトリからある時点のファイルツリーを取り出したもので、ここでファイルの変更などを行います。
+</p>
+
+<p>リポジトリから作業ツリーにファイルを取り出すことをチェックアウトといいます。「3.2節」参照)
+</p>
+
+<div class="fig">
+<img width="567" height="328" src="chap02.files/image016.jpg" />
+<p>図2.9　作業ツリーへのチェックアウトのイメージ</p>
+</div>
+
+
+<h4>(3) インデックス</h4>
+
+<p>リポジトリと作業ツリーの間に位置し、ファイルツリーの情報を格納します。
+</p>
+
+<p>チェックアウト時には、リポジトリからある時点のファイルツリーがインデックスに反映され、それを元に作業ツリーのファイルが変更されます。
+</p>
+
+<p>また、コミット(リポジトリに変更を登録)時には、作業ツリーの変更をインデックスに登録し、インデックスの内容をリポジトリに反映します。(「3.1節」参照)
+</p>
+
+<div class="fig">
+<img width="566" height="358" src="chap02.files/image018.jpg" />
+<p>図2.10　インデックスの位置付けのイメージ</p>
+</div>
+
+
+<h4>(4) stash</h4>
+
+<p>作業ツリーやインデックスの作業途中の状態を、一時的に退避させる領域です。
+</p>
+
+<p>作業ツリー上のすぐに完了できない作業を、作業途中でリポジトリに登録したり、ファイルのコピーを作ることなく、一時中断し、緊急のバグ修正に対応することができます。(「3.2節」参照)
+</p>
+
+<div class="fig">
+<img width="566" height="370" src="chap02.files/image020.jpg" />
+<p>図2.11　stashによる作業中断・復帰のイメージ</p>
+</div>
+
+
+<h4>(5) ブランチ</h4>
+
+<p>ソースコード管理システムでは、変更履歴の流れをリリース向け、開発向けのように分岐させることができます。それぞれの履歴ラインのことをブランチといいます。リポジトリでは複数のブランチを管理することができ、作業ツリーには１つのブランチのある時点のファイルツリーが展開され、このとき作業ツリーに関連付けられたブランチをカレントブランチといいます。
+</p>
+
+<p>なお、ブランチの系列は図2.12のように表現します。○印の節はコミットを表し、左から右へ(上下の場合は下から上へ)コミットを時系列に並べて表します。(「3.4節」参照)
+</p>
+
+<div class="fig">
+<img width="566" height="235" src="chap02.files/image022.jpg" />
+<p>図2.12　ブランチのイメージ</p>
+</div>
+
+
+<h4>(6) リモートブランチ</h4>
+
+<p>正確にはリモート追跡ブランチといいます。別のリポジトリ(リモートリポジトリ)から派生して作られたリポジトリの場合、派生元のリポジトリのブランチのコピーが作られます。
+ローカルリポジトリとリモートリポジトリの間で変更をやりとりするときに、中継点として位置します。
+</p>
+
+<p>このブランチは参照のみ可能で、リモートリポジトリの最新の内容を取り込むことはできますが、ローカルでリモートブランチへ変更を直接コミットすることはできません。(「3.3節」参照)
+</p>
+
+<div class="fig">
+<img width="566" height="308" src="chap02.files/image024.jpg" />
+<p>図2.13　リモートブランチのイメージ</p>
+</div>
+
+
+<h4>(7) リモートリポジトリ</h4>
+
+<p>現在のリポジトリ(ローカルリポジトリ)の派生元、あるいは現在のリポジトリから派生してできた外部のリポジトリです。
+gitはローカルリポジトリとリモートリポジトリ間で、変更の情報をやりとりすることにより、分散管理機能を実現しています。(「3.3節」参照)
+</p>
+
+<div class="fig">
+<img width="566" height="348" src="chap02.files/image026.jpg" />
+<p>図2.14　リポジトリ間の変更のやりとり</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c2-3" />
+<h2>2.3　初期設定</h2>
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+「Gitの世界」の紹介が終わったら、gitへ自己紹介しとこか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、自己紹介ですか？えーと、「ぱいん」といいます。よろし。。
+</div>
+
+<div>
+<b>ナス　　</b>
+おっと、ほんまに自己紹介するわけやないで。(ちょっと天然なんかな？)
+<br/>まぁ、自己紹介いうより、署名やな。
+gitの初期設定として、使う人の名前とメールアドレスを登録しとくんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+名前登録しないと使えないんですか？gitって。
+</div>
+
+<div>
+<b>ナス　　</b>
+使えんことはないんやけど。
+<br/>gitのコミットにはコミットした人の署名をつけるようになってんねん。
+そうせんと、誰が変更したか分からんようになるやろ。
+<br/>一人で使ってるうちは関係ないけど、グループで使い始めたら困るよってな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど、コミット用の署名が必要なんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+設定は git configっていうコマンド使うんや。
+名前とメールアドレスの登録はこうやな。
+<br/>
+<pre>
+$ git config --global user.name Pine
+$ git config --global user.email pine@example.com
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+git config..と。
+</div>
+
+<div>
+<b>ナス　　</b>
+設定した内容は git config --list で確認できるで。
+<pre>
+$ git config --list
+user.name=Pine
+user.email=pine@example.com
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ちゃんと設定されてるみたいですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+今、設定した内容は ~/.gitconfig ファイルに記録されてるで。
+<pre>
+$ cat ~/.gitconfig
+[user]
+　　　　name = Pine
+　　　　email = pine@example.com
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+コマンドには user.name、user.emailって指定しましたけれど、ファイルでは userでまとめられてるみたいですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやな。この [user]いうのはセクションいうねん。
+書式については、この後説明するわ。
+<br/>それから、今回は --globalってオプションつけたけど、これはユーザ毎の設定として ~/.gitconfigに反映されるねん。
+gitの設定は他にもホスト共通の設定やデフォルトの設定もあるよって、これも詳しく説明してこか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい、よろしくお願いします！
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>gitの設定を行います。
+git configは、ユーザ毎、ホスト共通などの設定範囲を指定することができます。
+</p>
+
+<pre>
+git config 　　　　　　# デフォルトの設定
+git config --global　　# ユーザ毎の設定
+git config --system　　# ホスト共通の設定
+</pre>
+
+<p>設定範囲を指定しない場合はデフォルトの設定として、リポジトリ毎の設定を参照します。
+また、デフォルトの設定を環境変数 GIT_CONFIGで設定することもできます。
+</p>
+
+<pre>
+$ env GIT_CONFIG=~/.gitconfig git config --list
+～ デフォルトで ~/.gitconfigを参照～
+</pre>
+
+<p>設定範囲毎の設定ファイルの所在と、設定内容の優先度は次のようになります。
+</p>
+
+<p class="caption">表2.1　設定ファイルと優先度</p>
+<table>
+<thead>
+  <tr>
+  <th>設定範囲</th>
+  <th>設定ファイル</th>
+  <th>優先度</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+  <td>デフォルト
+  </td>
+  <td>{リポジトリ}/.git/config
+  <br/>もしくは、環境変数GIT_CONFIGで指定したファイル
+  </td>
+  <td rowspan="3" align="center">高<br/>
+  <img src="chap02.files/image027.png" /><br/>
+  低
+  </td>
+  </tr><tr>
+  <td>ユーザ毎
+  </td>
+  <td>~/.gitconfig
+  </td>
+  </tr><tr>
+  <td>ホスト共通
+  </td>
+  <td>{インストール先}/etc/gitconfig
+  <br/>ex. /usr/local/etc/gitconfig
+  <br/>　　/etc/gitconfig
+  </td>
+  </tr>
+</tbody>
+</table>
+
+
+<p>コマンドで値の設定、設定解除、一覧表示するには、以下のオプションを指定します。
+</p>
+
+<p>
+<pre>
+# 値を設定 (user.nameに Pineを設定)
+$ git config user.name Pine
+
+# 設定を解除 (user.nameを解除)
+$ git config --unset user.name
+
+# 設定の一覧表示
+$ git config --list
+</pre>
+</p>
+
+<p>設定ファイルの書式と、コマンドラインに指定する設定値の展開名は次のようになっています。
+設定ファイルはただのテキストファイルなので、ファイルを編集して設定することもできます。
+</p>
+
+
+<div class="fig">
+<img width="567" height="228" src="chap02.files/image029.jpg" />
+<p>図2.15　設定ファイルの書式と展開名</p>
+</div>
+
+
+<p>図のように [ ]付きのラベルでセクションを指定し、設定を「名前 = 値」の形式で記述します。
+各設定値の行頭は TABで開始し、次のセクションのラベルが現れるまでは同じセクション内となります。
+セクションにサブセクションを設ける場合は、[ ] の中にダブルクォート付きでサブセクション名を記述します。
+設定ファイルのセクション、サブセクション、設定名には、それぞれ以下の文字が使用可能です。
+</p>
+
+
+<p class="caption">表2.2　設定要素と使用可能な文字</p>
+<table>
+<thead>
+  <tr>
+  <th>要素</th>
+  <th>使用可能な文字</th>
+  <th>大文字/小文字の区別</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+  <td>セクション
+  </td>
+  <td>英数字、"-"
+  </td>
+  <td>なし
+  </td>
+  </tr><tr>
+  <td>サブセクション
+  </td>
+  <td>英数字、"-"、"."
+  </td>
+  <td>あり
+  </td>
+  </tr><tr>
+  <td>設定名
+  </td>
+  <td>英数字、"-"
+  </td>
+  <td>なし
+  </td>
+  </tr>
+</tbody>
+</table>
+
+
+<p>gitにはたくさんの設定項目があります。
+その他の設定項目、およびコマンドの詳細は「6章」を参照して下さい。
+</p>
+
+</body>
+
+</html>

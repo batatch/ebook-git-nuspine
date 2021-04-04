@@ -1,0 +1,1168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>3.3　グループで共同作業</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c3-3" />
+<h2>3.3　グループで共同作業</h2>
+
+
+<a name="c3-3-1" />
+<h3>3.3.1　リポジトリをコピーする</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+そろそろキャッシュサーバの開発におれも加わるよ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え？今まで入ってなかったんですか？修正とかしてもらってましたけど。
+</div>
+
+<div>
+<b>ナス　　</b>
+ああ、あれはソースの修正をぱいんちゃんに入れてもらってたやろ？
+せやなくて、おれもリポジトリ持って git のグループ作業始めよかな思て。
+</div>
+
+<div>
+<b>ぱいん　</b>
+じゃあ、いよいよ分散管理になるんですね♪どきどき。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、リポジトリのコピーからやろか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+コピーですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+分散管理いうけど、基本は自分用に別のリポジトリを元にコピーを作ることやねん。<br/>
+そんで、コピーしたリポジトリ間で変更をやりとりして、状態を同期したりするのが、分散管理ってことやな。大雑把やけど。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、分かったような、分からないような。。
+</div>
+
+<div>
+<b>ナス　　</b>
+実際にやってみた方がええかな。ぱいんちゃんが使てたリポジトリからコピー作ってみるで。
+<pre>
+$ git clone /home/pine/git/minitable
+Initialized empty Git repository in /home/nus/git/minitable/.git/
+$ ls -a minitable/
+./    ../    .git/    src/
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ちゃんと、コピーできてるみたいですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+コピーして作ったリポジトリは、コピー元のリポジトリの変更を取り込むことができるんや。
+履歴も入ってるよって、バックアップにもなるで。<br/>
+ちなみに、今作ったんは、ぱいんちゃんのリポジトリがコピー元やから、ぱいんちゃんが変更をコミットしたら、
+git pullコマンドで変更を取り込むことができるんや。
+<pre>
+$ git pull
+remote: Counting objects: 7, done.
+remote: Total 3 (delta 0), reused 0 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From /home/pine/git/minitable
+   016da70..1693d14  master     -> origin/master
+Updating 412e740..1693d14
+Fast forward
+ src/minitable/MiniTable.java |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+それが、同期するってことなんですね。<br/>
+あ、でも逆に私が先生の変更を取り込みたいときはどうしたらいいのかな？
+</div>
+
+<div>
+<b>ナス　　</b>
+うーん、それは残念ながらできんのや。。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え！？できないんですか。
+</div>
+
+<div>
+<b>ナス　　</b>
+ってのは冗談で、どのリポジトリから取り込むか指定したらできるで。
+<pre>
+$ git pull /home/nus/git/minitable
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんだぁ。できるんじゃないですかぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+せやけど、これはあまりお勧めはせえへんねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんでですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+今回は試しにぱいんちゃんの作業中のリポジトリから、直接コピーしたけど、
+ほんまは、作業中のリポジトリと他の人に見せる公開用のリポジトリというのを別にするんや。<br/>
+作業中のリポジトリで変更が途中やと、取り込んだ人のリポジトリでコンパイルエラーになるかもしれんやろ？
+</div>
+
+<div>
+<b>ぱいん　</b>
+そっか。自分用のリポジトリだから、やりかけの作業でもどんどんコミットできちゃいますもんね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうこと。とりあえず今回はコピーまでにしとこか。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="421" src="chap03-3.files/image002.png" />
+</div>
+
+
+<p>分散管理ツールである gitは、グループでの共同作業において力を発揮します。
+分散管理というと難しく聞こえますが、簡単にいうと次のような特徴があります。
+</p>
+
+<ul>
+<li>リポジトリのコピーが作れること</li>
+<li>リポジトリ間で変更のやりとりができること</li>
+</ul>
+
+<p>リポジトリのコピーは、ファイルのみでなく、変更の履歴も含む完全なコピーであり、
+履歴をやりとりすることで、リポジトリ間の状態を同期させることができます。
+</p>
+
+<p>このように、複数のリポジトリを連携させて管理させるものを分散管理型のソースコード管理システムといいます。
+リポジトリのコピーを作るには git cloneコマンドを使います。
+
+<pre>
+git clone &lt;コピー元のリポジトリ&gt;
+</pre>
+</p>
+
+<p>git clone は新しいリポジトリを初期化し、コピー元のリポジトリから変更履歴を取り込みます。
+リポジトリを作成する git initと、変更履歴の取り込み処理を合わせたようなコマンドです。
+</p>
+
+<p>変更履歴の取り込みには、git pull というコマンドを利用します。
+git cloneで作られたリポジトリであれば、以下のコマンドでコピー元から変更履歴を取り込みます。
+
+<pre>
+git pull origin master
+</pre>
+</p>
+
+<p>git cloneで作られたリポジトリで、コピー元から変更履歴を取り込むのであれば、単に、
+
+<pre>
+git pull
+</pre>
+
+だけで取り込みできます。
+</p>
+
+<p>git clone、および git pull の他のオプションについては、「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-3-2" />
+<h3>3.3.2　リポジトリ間で変更を反映する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+今日はリポジトリの公開ですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+朝から、はりきってるなぁ。。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+リポジトリを他の人と連携するには、作業用のリポジトリと、公開用のリポジトリってのを作るんや。<br/>
+作業用のリポジトリは場所はどこにあってもええけど、公開用のリポジトリは ちゃんと決められた場所に置くんやで。
+それから、公開用には作業途中のコミットとかを含めないようにせなあかん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、公開用のリポジトリ作ろか。
+公開用のリポジトリは「裸のリポジトリ」にするんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、裸。。？ aoyama課長ーっ、ナス先輩がセクハ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+わわわ、ちゃうねんて。<br/>
+bare リポジトリいうて、チェックアウトのないリポジトリのことやねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+もう、びっくりするじゃないですか！<br/>
+でも、チェックアウトがないってどういうことだろ？
+</div>
+
+<div>
+<b>ナス　　</b>
+やってみよか。<br/>
+git init に --bareオプションつけてリポジトリ作るんや。
+<pre>
+$ mkdir minitable.git
+$ cd minitable.git/
+$ git init --bare
+$ ls
+HEAD  branches/  config  description  hooks/  info/  objects/  refs/
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ、なんだかいろいろなファイルができましたね。
+</div>
+
+<div>
+<b>ナス　　</b>
+これは、.git/ ディレクトリに作られてたファイル達でな。
+今まで使てたリポジトリは、展開されたソースコード、つまりチェックアウトと、リポジトリ本体の .git/ が含まれてたやろ？
+bare リポジトリは本体の .git/ だけのリポジトリってことなんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+チェックアウトがないって、そういうことなんですね。<br/>
+.git/ だけだから、minitable.git/ って名前なんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ディレクトリ名に決まりはないんやけど、慣習的に bare リポジトリは *.gitっていう名前にしてるな。<br/>
+で、このリポジトリに作業リポジトリの内容を突っ込むんや。
+<pre>
+$ git push /home/pine/git/minitable.git/ master
+Counting objects: 15, done.
+Compressing objects: 100% (5/5), done.
+Unpacking objects: 100% (15/15), done.
+Writing objects: 100% (15/15), 1.04 KiB, done.
+Total 15 (delta 0), reused 0 (delta 0)
+To /home/pine/git/minitable.git
+ * [new branch]      master -> master
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+これで、公開リポジトリができたんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+あとは、これを公開する場所に配置しよか。<br/>
+場所はどこでもええけど、今回は /opt/scm/git/pine に置くで。
+ディレクトリのオーナーは pine にしてるよってな。
+<pre>
+$ mv minitable.git /opt/scm/git/pine/
+</pre>
+
+これで、他の人がぱいんちゃんの公開リポジトリ見るときは、/opt/scm/git/pine/minitable.git を参照すればええわけや。
+前のリポジトリは退避しといて、公開リポジトリから新しい作業リポジトリを作るで。
+<pre>
+$ mv minitable/ minitable.old
+$ git clone /opt/scm/git/pine/minitable.git minitable
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+作業リポジトリは公開リポジトリから作るんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+こうしておけば、作業リポジトリから git push origin master で変更を反映できるんや。
+origin というのは、デフォルトで git clone のコピー元をさしてるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+これで、私の公開リポジトリができたんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+運用では、自分の公開リポジトリへや自分だけが反映、他の人には公開リポジトリを参照してもらうんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほどぉ。そうすれば途中の作業と公開できる内容を整理できるんですね♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="418" src="chap03-3.files/image004.png" />
+</div>
+
+
+<p>リポジトリのコピー間で変更をやりとりして、分散管理構成で運用するには、
+通常、利用者毎に公開用、作業用の２つのリポジトリを用意します。
+</p>
+
+<p>公開用のリポジトリは、グループの他の開発メンバからもアクセス可能な場所に配置することになります。
+なぜなら、作業は通常 HOMEディレクトリなど個人的な場所で行うため、他人からアクセスできないことが多いからです。
+</p>
+
+<p>また、gitでは自分のリポジトリに頻繁にコミットを行うため、変更が完了していない状態もあり、
+常に他人が参照できる「切りのよい」状態とは限らないからです。
+</p>
+
+<p>したがって、公開リポジトリには他人が参照してもいいように、常に「変更が完結した状態」にしておきます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="307" src="chap03-3.files/image006.jpg" />
+<p>図3.9　公開リポジトリと作業リポジトリ</p>
+</div>
+
+
+<p>公開リポジトリは、他人に参照してもらうために用意するものなので、
+通常は公開リポジトリ上では編集などの作業を行いません。
+</p>
+
+<p>編集などの作業を行わない場合は、リポジトリのチェックアウトは必要ないので、
+チェックアウトのないリポジトリとして作成します。
+チェックアウトのないリポジトリを bare リポジトリといいます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="314" src="chap03-3.files/image008.jpg" />
+<p>図3.10　リポジトリと通常のリポジトリ</p>
+</div>
+
+
+<p>bare リポジトリは git init でリポジトリを作成するときに、--bare オプションをつけて作成します。
+(git initのオプションは 「6章」を参照)
+
+<pre>
+$ mkdir proj.git
+$ cd proj.git/
+$ git init --bare
+</pre>
+</p>
+
+<p>リポジトリを作成したら、作業中のリポジトリから今までの変更履歴を流し込みます。
+他のリポジトリに変更を送るには git push コマンドを使います。
+
+<pre>
+git push &lt;送り先リポジトリ&gt; master
+</pre>
+</p>
+
+<p>bare リポジトリに変更履歴を流し込んで、公開リポジトリを作成し、公開用の場所に配置したら、
+コピーを作って新しい作業リポジトリとします。
+
+<pre>
+$ cd proj/                       # 元の作業リポジトリ
+$ git push ../proj.git master    # bareリポジトリに変更履歴を流し込み
+$ cd ..
+$ mv proj.git /pub/to/dir/       # 公開場所に配置
+$ git clone /pub/to/dir/proj.git proj.new
+                                 # 公開リポジトリのコピーを作成
+$ mv proj/ proj.old              # 元の作業リポジトリを退避し、
+$ mv proj.new/ proj              # コピーを新しい作業リポジトリにする
+</pre>
+</p>
+
+<p>git clone で作成した作業リポジトリから、公開リポジトリへの変更の反映は次のように行います。
+
+<pre>
+$ git push origin master
+</pre>
+</p>
+
+<p>ここでは、「origin」はコピー元のリポジトリ(公開リポジトリ)を参照しています。
+</p>
+
+<p>なお、git push では、送り先のリポジトリのファイルに書き込み権限がないとコマンドはエラーとなります。
+公開リポジトリのファイルを自分以外が書き込みできないようにしておくと、他人に勝手に変更されません。
+つまり、リポジトリを所有者以外は書き込み不可にすることで、リポジトリの所有者のみが更新可能になります。
+</p>
+
+<p>公開リポジトリの運用では、自分の公開リポジトリは git push により、自分のみが更新できるようにし、
+他のユーザからは自分の公開リポジトリから変更を取り込んでもらうようにします。
+(他のユーザに自分の公開リポジトリを変更させない)
+</p>
+
+
+<div class="fig">
+<img width="484" height="215" src="chap03-3.files/image009.png" />
+<p>図3.11　公開リポジトリの運用</p>
+</div>
+
+
+<p>git push の他のオプションについては 「6章」を参照して下さい。
+</p>
+
+<p>また、複数人で変更を共有するようになると、複数の変更を合成しないといけなくなります。
+これを「マージ」といいます。
+通常、git pullで変更を取り込むときには、git が自動で「マージ」の作業を行ってくれるのですが、
+２つの変更の変更位置が重なり、自動で「マージ」ができなくなると、「CONFLICT(衝突)」という状態になります。
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap03-3.files/image011.jpg" />
+<p>図3.12　CONFLICT(衝突)の発生</p>
+</div>
+
+
+<p>CONFLICT が発生すると、作業ツリーに自動マージの失敗箇所を示した、「unmerged」のファイルができます。
+
+<pre>
+$ git pull
+    :
+Auto-merging src/minitable/MiniTable.java
+CONFLICT (content): Merge conflict in src/minitable/MiniTable.java  # CONFLICT発生
+Automatic merge failed; fix conflicts and then commit the result.
+
+$ git status
+  src/MiniTable.java: needs merge
+    :
+# Changed but not updated:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       unmerged:   src/minitable/MiniTable.java   # マージが必要なファイル
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+</p>
+
+
+<p>マージファイルは次のような内容で、「&lt;&lt;&lt;&lt;&lt;&lt;」から「======」までがローカルでの変更、
+「======」から「&gt;&gt;&gt;&gt;&gt;&gt;」までが git push で取り込んだ変更で、変更位置が重なっていることを示しています。
+</p>
+
+
+<div class="fig">
+<img width="479" height="227" src="chap03-3.files/image012.png" />
+<p>図3.13　unmergedのコードのイメージ</p>
+</div>
+
+
+<p>これを次のように修正して、通常のコミットと同様に git add すると
+「unmerged」状態が解消され、コミットできるようになります。
+</p>
+
+
+<div class="fig">
+<img width="479" height="147" src="chap03-3.files/image013.png" />
+<p>図3.14　unmergedを修正したコードのイメージ</p>
+</div>
+
+<p>
+<pre>
+$ git add -u
+$ git status
+    :
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       modified:   src/minitable/MiniTable.java  # unmergedが解消されている
+#
+$ git commit -m "merged get method"
+[master 7d22506] merged get method
+</pre>
+</p>
+
+
+<p>２つの変更をマージしたコミットを git logで見てみると、２つのコミットから履歴がつながっているのが分かります。
+
+<pre>
+$ git log --pretty=oneline --graph
+*   7d225066...e52b8d9a merged git method
+|\ 
+| * 24bbbba9...61cf23b6 getメソッドの keyのチェック追加
+* | 2ae783c2...26857e1a getメソッドに expiredを追加
+|/ 
+* afabbb...79a235d9 ...
+* 82f8ce...faeae18c ...
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="258" src="chap03-3.files/image015.jpg" />
+<p>図3.15　マージの変更履歴</p>
+</div>
+
+
+<p>コミットの元になるコミットを親コミットといい、通常は１つの親を元にコミットが追加されますが、
+これはマージにより、２つのコミットを親にして追加されたことを意味しています。
+グループでの開発になると、このようにマージ作業が必要になってきます。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-3-3" />
+<h3>3.3.3　共用リポジトリを作る</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+リポジトリの運用には、共用リポジトリを使う方法もあるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+共用リポジトリですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+今は、ぱいんちゃんとおれの２人だけやけど、メンバが増えてそれぞれが公開リポジトリ持つようになったら、ややこしなるやろ？
+誰が最新の状態を管理するとかルールも必要になるしな。<br/>
+オープンソースの開発では、分散管理はとても便利やけど、会社などの組織で使おう思たら、ちょっと敷居高いしな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですねぇ。<br/>
+今、誰と誰の変更を取り込んで。。とか複雑になりそうですもんね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そういう場合には、共用リポジトリを作って、みんなはそこからコピー、反映することもできるんや。<br/>
+従来の Subversionなどの中央集権型の運用になるけど、会社とかに導入するには適した形と言えるな。
+中央集権型のシンプルな管理と、作業リポジトリでローカルにコミットできるメリットを組み合わせたようなカンジやな。
+</div>
+
+<div class="fig">
+<img width="436" height="280" src="chap03-3.files/image017.png" />
+</div>
+
+
+<div>
+<b>ぱいん　</b>
+いいとこ取りみたいですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+まずは、共有用のリポジトリを作成するで。
+<pre>
+$ mkdir minitable.git
+$ cd minitable.git/
+$ git init --bare --shared
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+bareリポジトリ作るときに、--sharedをつけるんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+これで、リポジトリへのグループ書き込みができるようになるんや。
+普通に作ったら、作成したユーザしか書き込みできんよってな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+グループってなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+UNIXでは、ユーザをグループでまとめることができて、ファイルにはグループでの書き込み権限とかを設定できるんや。
+--sharedつけて作ったリポジトリにはセットグループID(SGID)ってのがついてグループの所有ってことになるんやで。
+<pre>
+$ ls -l minitable.git/
+    :
+drwxrwsr-x 7 pine pine 4096 2009-09-03 21:31 minitable.git/
+      ^
+</pre>
+
+共用リポジトリに書き込みできるグループにユーザを登録して、権限を管理するわけや。
+誰でも書き込みできたら困るよってな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+確かに、開発メンバ以外でも書き込みできちゃうと困っちゃいますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+で、公開リポジトリ作ったときと同じで、作業リポジトリから、共用リポジトリに pushしよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。
+<pre>
+$ git push ../minitable.git/ master
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+場所は /opt/scm/git/minitable.git に置こか。<br/>
+リポジトリができたら、アクセス制御の設定していくで。
+共用リポジトリ用に "gituser"いうグループ作ったよって、リポジトリの所有グループ変更しとこか。
+root で作業するよって慎重にな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+初めての root作業です。。どきどき。
+<pre>
+# chgrp -R gituser /opt/scm/git/minitable.git/
+# ls -l /opt/scm/git/minitable.git/
+合計 32
+-rw-rw-r--  1 pine gituser   23 2009-09-03 21:31 HEAD
+   :
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+そしたら、"gituser"グループに、ぱいんちゃんと俺を追加しよか。
+<pre>
+# groups pine
+pine : pine          &lt;--- 現在は "pine"グループだけに所属
+# usermod -a -G gituser pine
+# groups pine
+pine : pine gituser  &lt;--- 所属グループを追加
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+できました♪
+</div>
+
+<div>
+<b>ナス　　</b>
+あとは、共用リポジトリからリポジトリをコピーしたらOKやで。
+<pre>
+nus$ git clone /opt/scm/git/minitable.git minitable
+nus$ cd minitable/
+nus$ git pull
+
+～変更・コミット～
+nus$ git push origin master
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+私からも git pushできました♪ちゃんと共有できてますね。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="416" src="chap03-3.files/image019.png" />
+</div>
+
+
+<p>開発メンバがそれぞれ自分の公開リポジトリを持つ運用方法について説明しました。
+</p>
+
+<p>この方法は、オープンソース開発などでは、コミットを管理が柔軟になり、また管理作業をメンバで分担したり、
+プロジェクトのメンテナンスの引継ぎが容易などの利点がある一方、作業が複雑になるという問題もあります。
+とくに会社や部門などの組織で運用する場合は、メンバ全員が git の分散管理機能を習得するのが難しいこともあります。
+(git はコマンドの数も多い)
+</p>
+
+<p>このような場合に、メンバがアクセスできる共用のリポジトリを用意する方法があります。
+従来の Subversionなどのツールによる中央集権型の運用方法です。
+
+<div class="fig">
+<img width="566" height="256" src="chap03-3.files/image021.jpg" />
+<p>図3.16　共用リポジトリによる運用</p>
+</div>
+</p>
+
+
+<p>共用リポジトリにするからといって、分散管理ツールの利点がなくなってしまうかというと、そうではありません。
+</p>
+
+<p>Subversionなどでは、作業途中の変更はコミットできないため、作業ファイルとして保留状態が続くことがありましたが、
+git を使う場合は、メンバは個々にリポジトリを持つので、任意のタイミングでコミットし、
+作業が完結した時点で共用リポジトリに反映するという形での運用が可能になります。
+ちょうど、個々のリポジトリがバッファのような役目を果たします。
+共用リポジトリは git initコマンドに --sharedオプションをつけて、リポジトリを作成します。
+(git initのオプションの詳細は 「6章」を参照)
+<pre>
+git init --bare --shared
+</pre>
+</p>
+
+<p>通常、共用リポジトリを運用する場合は、誰でも書き込みできては困るので、グループで書き込みできるようにします。
+--shared オプションをつけると、リポジトリには SGID(セットグループID)が設定されます。
+
+<pre>
+$ mkdir minitable.git
+$ cd minitable.git/
+$ git init --bare --shared
+$ cd ../
+$ ls -l minitable.git/
+    :
+drwxrwsr-x 7 pine pine 4096 2009-09-03 21:31 minitable.git/
+</pre>
+</p>
+
+<p>SGIDの設定されたリポジトリを公開場所に配置し、所有グループを変更します。
+(rootで作業する必要があるかもしれません)
+
+<pre>
+# mv minitable.git /pub/to/dir/
+# cd /pub/to/dir/
+# chgrp -R myproj minitable.git/   # リポジトリの所有グループを変更
+</pre>
+</p>
+
+<p>あとはこのグループにメンバを追加していけば、グループに所属のメンバのみが書き込み(git push)できるようになります。
+
+<pre>
+# usermod -a -G myproj user1  # myprojグループに user1を追加
+# groups user1
+user1 : user1 myproj          # user1の所属グループをチェック
+</pre>
+</p>
+
+<p>また、これまでは１つのサーバ内での運用を見てきましたが、
+ネットワークの別のパソコンなどからアクセスすることもできます。
+共用リポジトリを配置したサーバに sshでログインできるようにして、共用リポジトリを sshの URLで指定します。
+
+<pre>
+$ git clone ssh://pine@gitserver/pub/to/dir/minitable.git
+pine@gitserver's password:    # sshの認証が行われる
+remote: Counting objects: 29, done.
+remote: Compressing objects: 100% (12/12), done.
+remote: Total 29 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (29/29), done.
+</pre>
+</p>
+
+<p>git pullや git pushなど、ネットワークからアクセスする場合に認証が行われます。
+ネットワークでのアクセスができるようになると、以下のような作業スタイルができるようになります。
+</p>
+
+<ul>
+<li>作業用のノートパソコンにソースを取り込む。</li>
+<li>外出先ではローカルのリポジトリにコミットしながら作業。</li>
+<li>外出先から戻ったら git push で共用リポジトリに変更を反映。</li>
+</ul>
+
+<p>ネットワークからのアクセスはできるようになりましたが、
+このままでは毎回 git pull、git push とするたびにパスワードを聞かれて面倒です。
+こういうときは、SSHの秘密鍵、公開鍵の登録をしておくと、パスワード入力なしでアクセスできて便利です。
+</p>
+
+<p>まず、サーバに接続したいPCで鍵を作成します。
+
+<pre>
+$ ssh-keygen -t rsa         # RSA暗号方式の鍵を作成
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/nus/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):   # パスフレーズを入力
+Enter same passphrase again:
+Your identification has been saved in /home/nus/.ssh/id_rsa.
+Your public key has been saved in /home/nus/.ssh/id_rsa.pub.
+The key fingerprint is:
+7d:db:f4:e7:2c:e9:00:4b:0e:10:1a:5b:7e:1e:3d:3b nus@gitserver
+</pre>
+</p>
+
+<p>HOMEディレクトリの .ssh/ に以下のファイルができます。
+
+<ul>
+<li>${HOME}/.ssh/id_rsa　　　# 秘密鍵</li>
+<li>${HOME}/.ssh/id_rsa.pub　# 公開鍵</li>
+</ul>
+</p>
+
+<p>秘密鍵は名前のとおり、他人に知られてはいけない鍵情報が入っていて、
+ファイルのパーミッションも自分以外は読み書きできないようになっています。
+また、ネットワーク上でファイルをやり取りしてはいけません。
+</p>
+
+<p>公開鍵は接続相手に教える鍵情報で、これをサーバ上に登録します。
+サーバにログインして、${HOME}/.ssh/authorized_keys ファイル(なければ作成)に、
+公開鍵の内容を追加します。
+authorized_keysファイルも自分以外は読み書きできないようにしておきます。
+
+<pre>
+$ cat id_rsa.pub >> ${HOME}/.ssh/authorized_keys
+$ chmod 600 ${HOME}/.ssh/authorized_keys
+</pre>
+</p>
+
+<p>次にエージェントを起動します。
+初回のログインができたら、以降のログインはエージェントが変わりに認証処理を行ってくれます。
+
+<pre>
+$ eval `ssh-agent`
+Agent pid 1980     # エージェントが起動する
+$ ssh-add ~/.ssh/id_rsa  # 秘密鍵を登録する
+Enter passphrase for /home/nus/.ssh/id_rsa:   # 初回パスフレーズを入力
+Identity added: /home/nus/.ssh/id_rsa (/home/nus/.ssh/id_rsa)
+$ ssh nus@gitserver  # サーバにログインしてみる
+   :
+</pre>
+</p>
+
+<p>パスワード入力なしでログインできることを確認したら、ログアウトします。
+以降は、このシェル(ssh-agentを起動したコマンドプロンプト)からは、
+パスワード入力なしで git pull、git push ができるようになります。
+</p>
+
+<p>最後に作業が終了したらエージェントを終了します。
+
+<pre>
+$ eval `ssh-agent -k`
+Agent pid 1980 killed   # エージェントを終了
+</pre>
+</p>
+
+<p>サーバに接続したいパソコンを増やす場合は、接続したいパソコンで鍵を作って、
+公開鍵をサーバ上の authorized_keysに追記します。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-3-4" />
+<h3>3.3.4　さまざまなグループ開発</h3>
+
+
+<p>gitを使ったグループ開発の例として、メンバがそれぞれ公開リポジトリを持つスタイルと、
+共用のリポジトリを用意するスタイルを説明しました。
+しかし、gitはこれらの２通りのどちらかを利用しないといけないわけではありません。
+</p>
+
+<p>ここでは、gitによりいろいろな開発スタイルを紹介します。
+</p>
+
+
+<h4>Peer-to-Peerスタイルと共用スタイルの併用</h4>
+
+<p>先に説明したメンバごとに公開リポジトリを持つ形は、Peer-to-Peer(P2P)スタイルと呼ばれています。
+P2Pスタイルでは、各メンバが作業用、公開用のリポジトリを持っているので、
+従来の中央集権型のツール(Subversionなど)と比べて、次のような利点があります。
+</p>
+
+<style type="text/css">
+dd { padding-top: 5px; padding-bottom: 5px; }
+</style>
+
+<p>　</p>
+<dl>
+<dt>○作業用リポジトリで実験的な変更も記録(コミット)しながら進められる</dt>
+<dd>→中央集権型では、作業領域での変更を自分で管理する(ファイルコピーなど)</dd>
+<dt>○自分用の公開リポジトリを持っているので、自由なタイミングで変更を他のメンバに見てもらえる</dt>
+<dd>→中央集権型では、未完成の変更を自由にリポジトリに登録できない</dd>
+<dt>○他のメンバの変更を、自由なタイミングで自分のリポジトリで確認できる</dt>
+<dd>→中央集権型では、ツールの機能ではなくファイルを受け取って確認する</dd>
+</dl>
+<p>　</p>
+
+
+<p>自分の好きなタイミングで、これらの作業をできるのが分散管理の強みですが、
+逆に自由すぎて統制が取りづらいという弱みもあります。
+たとえば、誰のどのファイルが正式版(リリース版)なのか、決めておかないといけません。
+</p>
+
+<p>一方、共用リポジトリを使った共用スタイルでは、完成した変更は共用リポジトリに集約されるので、
+次のような利点があります。
+</p>
+
+<p>　</p>
+<dl>
+<dt>○共用リポジトリのファイルが常に正式版となる</dt>
+<dd></dd>
+<dt>○共用リポジトリの変更履歴が、プロジェクト自体の作業履歴になる</dt>
+<dd></dd>
+</dl>
+<p>　</p>
+
+<p>自分のリポジトリであれば、コミットを取り消すなど履歴を修正することもできますが、
+共用リポジトリの場合は、それは許されません。
+</p>
+
+<p>これらの２つのスタイルを併用できれば、分散管理の柔軟性と、統制のとれた管理の両立ができることが分かります。
+</p>
+
+<div class="fig">
+<img width="566" height="254" src="chap03-3.files/image023.jpg" />
+<p>図3.17　共用スタイルの利用</p>
+</div>
+
+
+<p>共用スタイルの場合は、完成した変更でないと公開することができません。
+しかし、P2Pスタイルを併用していれば、完成していないけど一時的に他のメンバに見てもらいたい変更は、
+自分の公開リポジトリを通して公開することができます。
+</p>
+
+<p>たとえば、社内のワークフローとして、正式にコミットする前にレビュー、承認が必要とされいている場合は、
+以下のように実施することができます。
+</p>
+
+<div class="fig">
+<img width="566" height="332" src="chap03-3.files/image025.jpg" />
+<p>図3.18　P2Pスタイルと共用スタイルの併用の応用</p>
+</div>
+
+
+
+
+<h4>階層的なリポジトリ</h4>
+
+<p>大規模なプロジェクトでは、プロダクトが複数のモジュールに分割され、
+それぞれを別の開発チームが担当することがあります。
+</p>
+
+<p>社内の開発では異なる部門にまたがって開発することもあり、
+ひとつのリポジトリをすべてのチームが共有して開発するのが難しくなります。
+</p>
+
+<p>従来の管理ツールを用いた場合では、各チームでモジュールごとにリポジトリ管理され、
+全体の取りまとめチームに、パッチ(変更差分)を送付するなどして連携していました。
+</p>
+
+<div class="fig">
+<img width="566" height="330" src="chap03-3.files/image027.jpg" />
+<p>図3.19　大規模プロジェクトの運用 (従来)</p>
+</div>
+
+
+<p>gitのリポジトリを階層構造にすると、このようなチーム構成の開発にぴったりです。
+</p>
+
+<p>取りまとめチームが管理するリポジトリから、モジュール開発用のリポジトリをコピーで作成することで、
+チーム間のリポジトリを push/pullで連携させることができます。
+</p>
+
+<div class="fig">
+<img width="566" height="405" src="chap03-3.files/image029.jpg" />
+<p>図3.20　大規模プロジェクトの運用 (git)</p>
+</div>
+
+
+<p>チームの開発メンバは、自分のチームのモジュール用の共用リポジトリから作業リポジトリをコピーし、
+成果をモジュールの共用リポジトリへ pushしていきます。
+</p>
+
+<p>チームにはモジュールごとの管理者をおき、管理者はモジュールの共用リポジトリの変更を取りまとめ、
+全体の共用リポジトリへ pushします。
+取りまとめチームでは、全体の共用リポジトリに集められた変更をチェックし、全体のビルド、テスト、リリースなどを行います。
+</p>
+
+<p>リリースなど変更のとりまとめが一区切りすると、チームのモジュール管理者は、
+全体の共用リポジトリからモジュールの共用リポジトリへ変更を pullで取り込み、
+開発メンバは適宜、モジュールの共用リポジトリから変更を取り込みます。
+</p>
+
+<p>gitはリポジトリ構成を柔軟に構築でき、プロジェクトの規模に合わせられ、
+組織での独自な開発スタイルにも対応することができるのです。
+</p>
+
+
+
+
+<h4>リポジトリを広く公開</h4>
+
+<p>共用リポジトリを作成して、チームのメンバで共有する方法を紹介してきました。
+しかし、ネットワークからのアクセスに sshを用いるので、利用するにはサーバにアクセスできるアカウントが必要でした。
+</p>
+
+<p>利用者を sshで認証するのは、誰でも変更(push)できてしまうのが問題だったからですが、
+利用者が必ず変更を反映するとは限らず、参照(clone)だけしたいこともあります。
+</p>
+
+<p>たとえば、オープンソース開発では、通常、利用者はソースの取得だけできればよく、
+変更が必要なのはプロダクトのメンテナなど一部の人だけになります。
+また、社内の場合でも社内用のフレームワークツールや、
+業務支援ツールなどを開発者以外に広く使ってもらいたいことがあります。
+</p>
+
+<p>広くリポジトリを公開するには git-daemonという機能が便利で、git-daemonで公開するリポジトリは、
+次のような URLでアクセスします。
+
+<pre>
+git://server/path/to/proj.git
+</pre>
+</p>
+
+<div class="fig">
+<img width="566" height="420" src="chap03-3.files/image031.png" />
+</div>
+
+
+<p>「git:」は git独自のプロトコルで 9418ポートを使います。
+サーバ側で git-daemonコマンドを実行すると、git-daemon-export-okファイルが存在するリポジトリが公開されます。
+</p>
+
+
+<h5>[サーバ側]</h5>
+<p>
+<pre>
+remote $ touch /opt/scm/git/proj.git/git-daemon-ok
+remote $ git daemon
+</pre>
+</p>
+
+<h5>[クライアント側]</h5>
+<p>
+<pre>
+local $ git clone git://remote/opt/scm/git/proj.git proj
+Initialized empty Git repository in /home/pine/work/proj/.git/
+remote: Counting objects: 15, done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 15 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (15/15), done.
+</pre>
+</p>
+
+<p>リポジトリの配置場所を制限する場合は、--base-pathオプションを使います。
+
+<pre>
+remote $ git daemon --base-path=/opt/scm/git
+
+local $ git clone git://remote/proj.git  # /opt/scm/git 以下の相対パスで指定
+</pre>
+</p>
+
+<p>リポジトリの git-daemon-export-okファイルの有無で、リポジトリ単位に公開、非公開を切り分けることができますが、
+すべてのリポジトリを公開するのであれば、--export-allオプションを指定すると
+git-daemon-export-okファイルの有無に関係なく公開されます。
+
+<pre>
+remote $ git daemon --export-all
+</pre>
+</p>
+
+<p>なお、通常 git-daemonで公開したリポジトリは参照のみが可能で、pushで変更を反映することはできません。
+
+<pre>
+$ git push
+fatal: The remote end hung up unexpectedly  # pushは許容されない
+</pre>
+</p>
+
+<p>git-daemonで pushを許容するには、--enableオプションで receive-packサービスを有効にします。
+
+<pre>
+$ git daemon --enable=receive-pack
+</pre>
+</p>
+
+<p>ただし、git-daemonには認証機能がないため、--enableで pushを許容すると、誰でも push可能な状態となります。
+少人数のチームや、自分専用のサーバの場合には、手軽にリポジトリを公開できますが、
+一定規模以上のプロジェクトでは、git-daemonは参照用として公開し、pushは ssh経由でアカウントを制御するようにします。
+</p>
+
+
+<div class="fig">
+<img width="566" height="428" src="chap03-3.files/image033.jpg" />
+<p>図3.21　git-daemonと sshによる公開</p>
+</div>
+
+
+<p>その他の git-daemonのオプションについては、「6章」を参照して下さい。
+</p>
+
+
+</body>
+
+</html>

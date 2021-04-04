@@ -1,0 +1,1456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>6.　コマンドリファレンス</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c6" />
+<h1>6.　コマンドリファレンス</h1>
+
+
+<p>本章で紹介したコマンド、およびその他の gitコマンドのリファレンス集です。
+</p>
+
+<h4>git config</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- デフォルトの初期設定 (git config)         「2.3節」
+- ユーザー毎の初期設定 (git config --global)「2.3節」
+- ホスト共通の初期設定 (git config --system)「2.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-f &lt;file&gt;, --file &lt;file&gt;
+  任意のファイルを設定ファイルとして扱います。
+
+-l, --list
+  現在の設定内容を一覧表示します。
+  ex. $ git config -l
+        user.name=User1
+        user.email=user1@example.com
+
+--get &lt;name&gt;
+  設定項目名を指定して値を表示します。
+  ex. $ git config --get user.name
+      User1
+
+--unset &lt;name&gt;
+  設定項目名を削除します。 ただし、項目のみの削除で、セクションは残ります。
+  ex. $ git config --unset user.name
+ 
+--remove-section
+  セクションを削除します。
+  サブセクションがある場合は、サブセクションまで指定しないといけません。
+  ただし、セクション内に設定項目があると、すべて削除されるので注意が必要です。
+  ex. $ git config --remove-section user
+
+--rename-section
+  セクション名を変更します。
+  ex. $ git config --rename-section user account
+</pre>
+</p>
+
+<h5>[設定要素と使用可能な文字]</h5>
+<p>
+<pre>
+core.filemode
+  falseの場合はファイルモードの変更を無視します。デフォルトは trueです。
+  Windows環境では、ファイルのコピー時に、ファイルモードの情報が失われ、
+  gitが差分として検出してしまうため、falseにしておくといいでしょう。
+
+core.excludesfile
+  コンパイルの中間ファイル(*.o、*.class)など、gitの
+  管理対象として無視したいファイルを指定したファイル名を設定します。
+  (「3.1節」gitignore参照)
+
+core.editor
+  エディタを指定します。
+
+core.pager
+  ページャを指定します。
+ 
+alias.*
+  コマンドのエリアス(別名)を指定します。
+  ex. 最後のコミットを lastで参照できるようにする
+      $ git config alias.last 'cat-file commit HEAD'
+      $ git config -l
+         :
+      alias.last=cat-file commit HEAD
+      $ git last
+      ～最後のコミットの情報を表示～
+
+color.branch
+  trueにすると、ブランチをカラー表示します。
+  デフォルトは false
+
+color.diff
+trueにすると、差分をカラー表示します。
+デフォルトは false
+ 
+remote.&lt;name&gt;.url
+  別のリポジトリをコピーした場合、派生元のリポジトリのURLが設定されます。
+  ex. $ git config --get remote.origin.url
+      git@server.com:pine/project1.git
+
+remote.&lt;name&gt;.fetch
+  派生元のリポジトリのブランチと、ローカルのブランチの関連付けを設定します。
+  ex. $ git config --get remote.origin.fetch
+      +refs/heads/*:refs/remotes/origin/*
+
+user.name
+  コミットにつけられる署名を設定します。
+
+user.email
+  コミットにつけられるアドレスを設定します。
+</pre>
+</p>
+
+
+
+
+<h4>git add</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 新しいファイルをインデックスに登録(git add)        「3.1節」
+- 登録ファイルの変更をインデックスに登録(git add -u) 「3.1節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+
+<p>
+<pre>
+-n, --dry-run
+  addコマンドの模擬試験を実施します。
+
+-f, --force
+  指定されたファイルが無視する対象のファイルであっても強制的にインデックスへ登録します。
+
+-i, --interactive
+  インタラクティブモードでインデックスへの登録を実施します。
+
+-p, --patch
+  どの変更を次回のコミットに含めるかを選択して、インデックスに記録します。
+  変更の内容が、論理的に関連性ががない場合などに使用します。
+
+-u, --update
+  ワークツリー内の全てのファイルを記録します。
+
+-A, --all
+  新しく作成されたファイルを含めてインデックスに記録します。
+</pre>
+</p>
+
+
+
+
+<h4>git status</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 作業ツリーの変更状態の確認(git status) 「3.1節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-s, --short
+  短い形式で結果を出力します。
+
+-b, --branch
+  ブランチと追跡情報を短い形式で表示します。
+
+-u[&lt;mode&gt;], --untracked-files[=&lt;mode&gt;]
+  追跡してないファイルの表示
+  &lt;mode&gt;のパラメータは"no"、"normal"、"all"があります。
+  デフォルトは"all"ですが、git configコマンドからデフォルトを変更できます。
+  ex. $ git status -uno
+</pre>
+</p>
+
+
+
+
+<h4>git diff</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 作業領域とインデックスの差分(git diff)                 「3.1節」
+- 作業領域と最新のコミットの差分(git diff  HEAD)         「3.1節」
+- インデックスと最新のコミットの差分(git diff --cached)  「3.1節」
+- パッチファイルを作成(git diff > ファイル名)            「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--stat
+  通常のコミット情報に加えて、ファイルごとの変更行数などのサマリ情報を表示します。
+  ex. $ git diff --stat
+      hello.rb |    1 +
+      1 files changed, 1 insertions(+), 0 deletions(-)
+      $ git diff --cached --stat
+      hello.rb |    2 +-
+      1 files changed, 1 insertions(+), 1 deletions(-)
+      $ git diff HEAD --stat
+      hello.rb |    3 ++-
+      1 files changed, 2 insertions(+), 1 deletions(-)
+</pre>
+</p>
+
+
+
+
+<h4>git commit</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- リポジトリに変更を登録(git commit)       「3.1節」
+- コミットのやり直し(git commit --amend)   「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-a,  --all
+  追跡されているファイルの変更をインデックスに登録します。
+
+-m&lt;msg&gt;, --message=&lt;msg&gt;
+  &lt;msg&gt; をコミットメッセージとして登録します。
+  ex. $ git commit -a -m "コミットメッセージ"
+
+-n, --no-verify
+  pre-commit と commt-msg フックが省略されチェックが行われません。
+</pre>
+</p>
+
+
+
+
+<h4>git show</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 直前のコミットの情報を表示(git show) 「3.1節」
+- ブランチの情報を参照(git show-branch)「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--pretty=&lt;format&gt;
+  コミット情報をいろいろな形式で表示します。
+  formatには online、short、medium、full、fuller、email、rawが指定可能。
+
+--encoding[=&lt;encoding&gt;]
+  オプション無しのデフォルトはUTF-8です。
+</pre>
+</p>
+
+
+
+
+<h4>git reset</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- インデックスの変更の取り消し(git reset HEAD)    「3.1節」
+- 今回のコミット履歴を取り消し(git reset HEAD^)   「3.2節」
+- 作業ツリーまで変更を取り消し(git reset --hard)  「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--soft
+  コミット履歴が取消の対象になります。
+  インデックスと作業ツリーの変更は取消されないです。
+
+--mixed
+  コミット履歴とインデックスの変更が取消の対象になります。
+  作業ツリーの変更は取消されないです。デフォルト設定です。
+
+--hard
+  作業ツリーの変更まで取消の対象になります。
+</pre>
+</p>
+
+
+
+
+<h4>git rm</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- リポジトリに登録のファイルを削除(git rm)      「3.1節」
+- インデックスの変更の取り消し(git rm --cached) 「3.1節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-f, --force
+  リポジトリに登録してから変更があったファイルも削除を行います。
+
+-q, quiet
+  削除結果を表示しないです。
+
+-r
+  ディレクトリを削除する。
+  ex $ git rm -r &lt;ディレクトリ名&gt;
+</pre>
+</p>
+
+
+
+
+<h4>git ls-files</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- インデックスに登録し、追跡されているファイルを表示(git ls-files)  「3.1節」、「5.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-c, --cached
+  インデックスで管理しているファイルを表示します。（デフォルト）
+
+-d, --deleted
+  インデックスで管理しているファイルの中で削除したファイルを表示します。
+
+-m, --modified
+  インデックスで管理しているファイルの中で変更したファイルを表示します。
+
+-o, --others
+  作業ツリーのファイルの中でインデックスに登録されてないファイルを表示します。
+
+-i, --ignored
+  作業ツリーのファイルの中で無視しているファイルを表示します。
+
+--directory
+  ディレクトリのファイルに限られて表示します。
+
+-s, --stage
+  ファイルのオブジェクト名も表示します。
+
+-u, --unmerged
+  マージが必要なファイルを表示します。
+
+-z
+  ファイルを一行で表示します。
+
+--full-name
+  サーブディレクトリでコマンドを実行した場合、プロジェクトのトップディレクトリからのパスを表示します。
+</pre>
+</p>
+
+
+
+
+<h4>git ls-tree</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 詳細なtree オブジェクトの情報取得(git ls-tree &lt;tree-ish&gt;)  「5.1節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-z
+  一行で表示します。
+
+-l, --long
+  オブジェクトのサイズを表示します。
+</pre>
+</p>
+
+
+
+
+<h4>git log</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 変更履歴を参照(git log)  「3.1節」、「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-n &lt;number&gt;, --max-count=&lt;number&gt;
+-&lt;number&gt;
+  表示するコミット数を指定します。
+
+--color
+  コミット情報をカラー表示します。
+
+--since=&lt;date&gt;, --after=&lt;date&gt;
+  指定した日時以降にコミットしたものを表示します。
+  ex. --since="2009/8/12 16:00:00"
+
+--until=&lt;date&gt;, --before=&lt;date&gt;
+  指定した日時以前にコミットしたものを表示します。
+  ex. --since="2009/8/12 16:00:00"
+
+--author=&lt;pattern&gt;, --committer=&lt;pattern&gt;
+  変更者(author)、コミッタ(committer)で絞り込みます。(部分一致)
+
+--reverse
+  古いコミットから順に表示します。
+
+-p
+  通常のコミット情報に加えて、変更差分(diff)の内容も表示します。
+
+--raw
+  通常のコミット情報に加えて、変更されたファイル名の一覧を表示します。
+  一覧には変更前後のファイルのモード、ファイルのオブジェクトID、
+  変更種別(A:追加、M:変更など)、ファイルのパス名を表示します。
+
+--stat
+  通常のコミット情報に加えて、ファイルごとの変更行数などのサマリ情報を表示します。
+
+--pretty=&lt;format&gt;
+  コミット情報をいろいろな形式で表示します。
+  formatには online、short、medium、full、fuller、email、rawが指定可能。
+
+--graph
+  コミットの系統をグラフィカルに表示します。
+
+  git logのオプションごとの表示内容は以下のとおり。
+</pre>
+
+<style type="text/css">
+table {
+  font-size: small;
+}
+td {
+  text-align: center;
+}
+</style>
+
+<table>
+<tr>
+<th rowspan="2">　</th>
+<th rowspan="2">なし</th>
+<th rowspan="2">-p</th>
+<th rowspan="2">--raw</th>
+<th rowspan="2">--stat</th>
+<th colspan="7">--pretty</th>
+</tr>
+<tr>
+<th>oneline</th>
+<th>short</th>
+<th>medium</th>
+<th>full</th>
+<th>fuller</th>
+<th>email</th>
+<th>raw</th>
+</tr>
+<tr>
+<th>コミットID<br/>(commit)</th>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<th>著者<br/>(author)</th>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>　</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<th>作成日<br/>(author date)</th>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>　</td>
+<td>○</td>
+<td>○</td>
+<td>　</td>
+</tr>
+<tr>
+<th>コミッタ<br/>(commiter)</th>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>○</td>
+<td>　</td>
+<td>○</td>
+</tr>
+<tr>
+<th>コミット日<br/>(commiter date)</th>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+</tr>
+<tr>
+<th>メッセージ<br/>(1行目)</th>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<th>メッセージ<br/>(本文)</th>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<th>ツリーID<br/>(tree)</th>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+</tr>
+<tr>
+<th>親コミットID<br/>(parent)</th>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+</tr>
+<tr>
+<th>差分<br/>(diff)</th>
+<td>　</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+</tr>
+<tr>
+<th>ファイル一覧<br/>(詳細)※</th>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+</tr>
+<tr>
+<th>ファイル一覧<br/>(変更サマリ)</th>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>○</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+<td>　</td>
+</tr>
+</table>
+
+<pre>
+(*1) ファイル一覧の詳細。
+     モード、ファイルのオブジェクトID、変更種別、ファイルのパス名を表示
+</pre>
+</p>
+
+
+
+
+<h4>git checkout</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 作業ツリーの変更を取り消し(git checkout &lt;ファイル名&gt;)  「3.2節」
+- ブランチの切替(git checkout &lt;ブランチ名&gt;)              「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-b
+  ブランチを作成してから切替。
+  ex. $ git checkout -b &lt;ブランチ名&gt;
+
+-B
+  ブランチを作成してから切替します。
+  既に作成するブランチと同じ名前のブランチがあれば、上書きして作成します。
+
+-f, --force
+  切り替える時は、インデックスまたは作業ツリーがHEADと異なっていても進みます。
+  これは、ローカルの変更を破棄するために使用されます。
+</pre>
+</p>
+
+
+
+
+<h4>git revert</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 以前の変更を打ち消すコミットを登録 (git revert)   「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-e, --edit
+  エディタが起動して、コミット用のコメントを編集できます。
+  ターミナルから使用した場合、これがデフォルトのオプションとなります。
+
+-m parent-number
+  git revertによる履歴打ち消しの対象として、「マージされたコミット」を指定する場合、
+  どの親を本線とするのかを指定することで、「マージされたコミット」の打ち消しを可能とします。
+
+--no-edit
+  エディタを起動させずにコミットを行います。
+
+-n, --no-commit
+  git revertの実施結果がコミットとしてではなく、インデックスに反映されます。
+  git revertの効果に加えて、新しい変更を加えたものを一つのコミットとして登録したい場合に便利です。
+</pre>
+</p>
+
+
+
+
+<h4>git blame</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- ファイルの行毎のコミット履歴を一覧 (git blame &lt;ファイル名&gt;)  「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--show-stats
+  最後に統計情報を表示します。
+
+-L &lt;start&gt;,&lt;end&gt;
+  表示する行を指定します。
+  &lt;start&gt;,&lt;end&gt; のパラメータには数字、正規表現、+オフセットもしくは -オフセットの形式が使えます。
+  ex. $ git blame -L 40,60 foo
+      $ git blame -L 40,-20 foo
+      $ git blame -L '/^sub hello {/,/^}$/' foo
+
+-l
+  リビジョンを全て表示します。
+
+-t
+  元のタイムスタンプを表示します。
+
+-n,--show-number
+  コミットした時の元のライン番号を表示します。
+
+-s
+  名前とタイムスタンプを表示しません。
+</pre>
+</p>
+
+
+
+
+<h4>git tag</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- コミットに名前(タグ)をつける (git tag &lt;タグ名&gt;)  「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-l &lt;pattern&gt;
+  タグのリストを表示します。&lt;pattern&gt;を指定しない場合は全てのタグが表示されます。
+
+-d &lt;タグ名&gt;
+  タグを削除します。
+</pre>
+</p>
+
+
+
+
+<h4>git stash</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 作業ツリーの変更を一時的に退避(git stash)       「3.2節」
+- 退避中の変更の一覧表示(git stash list)          「3.2節」
+- 退避した作業を作業ツリーに戻す(git stash apply) 「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+show [&lt;stash&gt;], show -p [&lt;stash&gt;]
+  スタッシュに保存した変更情報を表示します。
+  スタッシュ名を指定しないと最新スタッシュの保存情報を表示します。
+  -pを付けるとgit diffのように表示します。
+  ex. $ git stash show
+      $ git stash show -p stash@{1}
+
+drop [&lt;stash&gt;]
+  スタッシュの一つを削除します。
+  ex. $ git stash drop stash@{1}
+
+clear
+  退避中の変更をすべて削除します。
+
+--index
+  git stash applyの場合は作業ツリーまで戻しますが、--indexを付けるとインデックスの変更も戻します。
+  ex. $ git stash apply --index
+</pre>
+</p>
+
+
+
+
+<h4>git apply</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- パッチファイルを適用(git apply &lt;パッチファイル名&gt;)  「3.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-R, --reverse
+  逆にパッチを適用します。
+
+--stat
+  パッチの情報（diffstat）を表示します。
+  パッチの適用は行いません。
+
+--numstat
+  機能は --statと類似です。
+  但し、表示情報が追加・削除のラインのみです。
+  パッチの適用は行いません。
+
+--check
+  そのパッチが適用される作業ツリーもしくはインデックスファイルに検出されるエラーがあれば表示します。
+  パッチの適用は行いません。
+</pre>
+</p>
+
+
+
+
+<h4>git clone</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 他のリポジトリのコピーを作成(git clone &lt;リポジトリ&gt;)  「3.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--bare
+  リポジトリをコピーして公開リポジトリを作成します。
+
+--quiet, -q
+  進捗情報などを表示しません。
+
+-v, --verbose
+  長々と実行します。
+</pre>
+</p>
+
+
+
+
+<h4>git pull</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- 他のリポジトリのコミット履歴を取り込み(git pull)  「3.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--stat
+  マージ終了の時にdiffstatを表示します。
+
+-n, --no-stat
+  マージ終了の時にdiffstatを表示しません。
+
+-q, --quiet
+  簡潔に表示します。
+
+-v, --verbose
+  詳細に表示します。
+
+--rebase
+  現在のリポジトリからあなたの各コミットを削除し、一時的に (".dotest" という名前のディレクトリ内に)パッチとして保存します。
+  現在のリポジトリを他のリポジトリの最新バージョンの位置に更新したら、その後で保存した各パッチをリポジトリブランチに適用します。
+  git config から常に rebase するように設定も可能です。
+</pre>
+</p>
+
+
+
+
+<h4>git push</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- コピー元のリポジトリへコミットを反映(git push)  「3.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-q, --quiet
+  進捗情報などを簡潔に表示します。
+
+-v, --verbose
+  長々と実行します。
+</pre>
+</p>
+
+
+
+
+<h4>git daemon</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- リポジトリをネットワークへ公開(git daemon)  「3.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--base-path
+  リポジトリの配置場所を制限します。
+  ex. remote$ git daemon --base-path=/opt/scm/git
+
+--export-all
+  git-daemon-export-ok ファイルの有無に関係なく公開されます。
+
+--enable=receive-pack
+  pushを許容します。
+
+--max-connections=&lt;n&gt;
+  同時クライアントの最大数です。
+  デフォルト32、制限無しは0を設定します。
+
+--syslog
+  stderr の代わりに syslog へログを記録します。
+</pre>
+</p>
+
+
+
+
+<h4>git branch</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- ブランチの一覧表示 (git branch)           「3.4節」
+- ブランチの作成 (git branch &lt;ブランチ名&gt;)  「3.4節」
+- 過去のある時点からブランチの作成 (git branch &lt;ブランチ名&gt; &lt;リビジョン&gt;)  「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-d
+  ブランチの削除
+  ex. $ git branch -d branch1
+
+-D
+  指定したブランチにマージされていないコミットがある場合も強制的に削除します。
+
+-m
+  ブランチ名を変更
+  ex. $ git branch -m &lt;元のブランチ名&gt; &lt;変更先ブランチ名&gt;
+
+-M
+  既におなじ変更先ブランチ名があっても強制的に上書きしてブランチ名を変更します。
+
+-r
+  リモートブランチを表示します。
+  オプション「-d」と一緒に使って削除も可能です。
+
+-a
+  ローカルブランチとリモートブランチの両方を表示します。
+
+
+-v, --verbose
+  各HEADのリビジョンとコミットメッセージを表示します。
+
+--abbrev=&lt;length&gt;
+  リビジョンの長さを指定します。デフォルトは7です。
+
+--no-abbrev
+  フールリビジョンで表示します。
+</pre>
+</p>
+
+
+
+
+<h4>git merge</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- ブランチ間のマージ(git merge &lt;ブランチ名&gt;)  「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--stat
+  マージの最後に更新情報を表示します。デフォルト。
+
+-n, --no-stat
+  マージの最後に更新情報を表示しません。
+
+-q, --quiet
+  進捗情報などを表示しません。
+
+-v, --verbose
+  長々と実行します。
+
+-m &lt;msg&gt;
+  マージコミットが作成される場合、コミットのメッセージを設定します。
+</pre>
+</p>
+
+
+
+
+<h4>git rebase</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- ブランチ生成元のコミットを移動(git rebase &lt;ブランチ名&gt;)  「3.4節」
+- rebaseの処理を取り消す (git rebase --abort)              「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--continue
+  マージ作業が続けられます。
+
+--abort
+  rebaseを開始する前の状態に戻ります。
+</pre>
+</p>
+
+
+
+
+<h4>git remote</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+-リモートハンドルの名前の表示（git remote）
+-リモートの追加（git remote add [リモート名] [url]）
+-リモートの名前を変更（git remote [変更前の名前] [変更後の名前]）
+-リモートを削除（git remote rm [リモート名]）
+-リモートの情報を表示（git remote show [リモート名]）
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-v, --verbose
+  名前と一緒にリモートURLも表示します。
+</pre>
+</p>
+
+
+
+
+<h4>git fetch</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- リモートリポジトリからコミットをダウンロードし、リモートブランチを更新 (git fetch)  「3.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--all
+  全てのリモートからfetchします。
+
+-q, --quiet
+  エラー・警告メッセージ以外は何も出力しなくなります。
+
+-v, --verbose
+  進捗情報を詳細に表示します。
+</pre>
+</p>
+
+
+
+
+<h4>git svn clone</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- すでにあるSVNのリポジトリから、gitのリポジトリを作成(git svn clone &lt;リポジトリ&gt; [ディレクトリ])  「4.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-T &lt;arg&gt;, --trunk=&lt;arg&gt;
+  SVNのトランクのディレクトリを指定します。
+
+-b &lt;arg&gt;, --branches=&lt;arg&gt;
+  SVNのブランチのディレクトリを指定します。
+
+-t &lt;arg&gt;, --tags=&lt;arg&gt;
+  SVNのタグのディレクトリを指定します。
+
+-s, --stdlayout
+  SVNの標準構成のディレクトリを指定します。
+  以下のようなオプションを指定したのと同じ意味になります。
+  -T trunk -b branches -t tags
+
+-r &lt;arg&gt;, --revision=&lt;arg&gt;
+  ダウンロードするSVNのリビジョンの範囲を指定します。
+  ex. -r 3       3から最新のリビジョンまでを取得
+      -r 3:HEAD  同上
+      -r BASE:3  最初から3までのリビジョンを取得
+      -r 3:5     3から5までのリビジョンを取得
+
+--prefix=&lt;arg&gt;
+  リモートブランチの名前にプレフィクスをつけます。(末尾の"/"が必要)
+  以下のように指定すると、リモートブランチにorigin/がつけられます。
+  ex. $ git svn clone -s --prefix=origin/ http://svn.server/svn/project1
+  $ git branch -r
+  origin/stable
+  origin/tags/v0.1
+  origin/trunk
+
+--username=&lt;arg&gt;
+  SVNの認証時のユーザー名を指定します。
+  ex. --username=pine
+  SSHを利用している場合(svn+ssh://)は、URLにユーザー名を指定します。
+  ex. svn+ssh://pine@svn.server/svn/project1/
+</pre>
+</p>
+
+
+
+
+<h4>git svn init</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- すでにあるSVNのリポジトリから、gitのリポジトリのみを作成(git svn init &lt;リポジトリ&gt; [ディレクトリ])  「4.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-T &lt;arg&gt;, --trunk=&lt;arg&gt;
+  cloneと同様
+
+-b &lt;arg&gt;, --branches=&lt;arg&gt;
+  cloneと同様
+
+-t &lt;arg&gt;, --tags=&lt;arg&gt;
+  cloneと同様
+
+-s, --stdlayout
+  cloneと同様
+
+--prefix=&lt;arg&gt;
+  cloneと同様
+
+--username=&lt;arg&gt;
+  cloneと同様
+</pre>
+</p>
+
+
+
+
+<h4>git svn fetch</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- SVNのリビジョンを取得(git svn fetch)  「4.2節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-r &lt;arg&gt;, --revision=&lt;arg&gt;
+  cloneと同様
+
+--username=&lt;arg&gt;
+  cloneと同様
+</pre>
+</p>
+
+
+
+
+<h4>git svn rebase</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- SVNのリポジトリの更新をダウンロード(git svn rebase)  「4.3節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--local, -l
+  SVNからのリビジョンをダウンロードせず、リモートリポジトリからマージを行います。
+
+--dry-run, -n
+  git svn rebaseで参照するリモートリポジトリ名とSVNリポジトリのURLを表示します。
+  ex. $ git svn rebase -n
+      Remote Branch: refs/remotes/trunk
+      SVN URL: http://svn.server/svn/project1/trunk
+
+--username=&lt;arg&gt;
+  cloneと同様
+</pre>
+</p>
+
+
+
+
+<h4>git svn dcommit</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- ローカルの gitでの変更を SVNへ反映(git svn dcommit)  「4.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--no-rebase
+  SVNリポジトリへ反映後に自動で git svn rebaseを実行しません。
+
+--edit, -e
+  エディタを起動し、SVNへ反映するコミットのログメッセージを編集します。
+  指定しない場合は、gitのコミット時のログで SVNへ反映します。
+
+--dry-run, -n
+  git svn dcommitで SVNに反映される差分(コミット)を表示します。
+  ex. $ git svn dcommit -n
+      Committing to http://svn.server/svn/project1/trunk ...
+      diff-tree 20732c41..e573b062~120732c41..e573b062
+
+--username=&lt;arg&gt;
+  cloneと同様
+</pre>
+</p>
+
+
+
+
+<h4>git svn branch</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- git側から SVNへブランチを作成(git svn branch &lt;ブランチ名&gt;)  「4.5節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--message=&lt;arg&gt;, -m &lt;arg&gt;
+  ブランチ作成のコミットへのメッセージを指定します。
+
+--dry-run, -n
+  git svn branchで作られるブランチのコピー元とコピー先を表示します。
+  ex. $ git svn branch -n stable2
+      Copying http://svn.server/svn/project1/trunk at r10 to http://svn.server/svn/project1/branches/stable2...
+</pre>
+</p>
+
+
+
+
+<h4>git svn tag</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- git側から SVNへタグを作成(git svn tag &lt;タグ名&gt;)  「4.5節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--message=&lt;arg&gt;, -m &lt;arg&gt;
+  branch と同様
+
+--dry-run, -n
+  git svn tagで作られるタグのコピー元とコピー先を表示します。
+  ex. $ git svn tag -n v0.3
+      Copying http://svn.server/svn/project1/trunk at r12 to http://svn.server/svn/project1/tags/v0.3...
+</pre>
+</p>
+
+
+
+
+<h4>git cat-file</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+特定のオブジェクトについての情報取得(git cat-file &lt;オブジェクト&gt;)  「5.1節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+-t
+  SHA-1からオブジェクトの種類を取得。
+  ex. git cat-file -t 72f415ba
+
+-s
+  SHA-1からオブジェクトのサイトを取得。
+
+&lt;type&gt;
+  タイプのオブジェクトを表示
+  ex. $ git cat-file commit 0462d179
+</pre>
+</p>
+
+
+
+
+<h4>git reflog</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- HEADがこれまでどのコミットを指してきたかというログを表示(git reflog)  「5.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+オプションはgit logと同様
+</pre>
+</p>
+
+
+
+
+<h4>git fsck</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- オブジェクトDBを検査し、dangling オブジェクトなどの種別とハッシュのリストを表示(git fsck)  「5.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--no-reflogs
+  reflog が存在する状態で git fsck を使って dangling オブジェクトを探します。
+
+--full
+  完全なチェック
+</pre>
+</p>
+
+
+
+
+<h4>git gc</h4>
+
+<h5>[機能]</h5>
+<p>
+<pre>
+- オブジェクトDBから不要なオブジェクトを削除し、適切に情報を圧縮(git gc)  「5.4節」
+</pre>
+</p>
+
+<h5>[オプション]</h5>
+<p>
+<pre>
+--aggressive
+  もっと積極的に最適化します。
+
+--prune=&lt;date&gt;
+  &lt;date&gt;より古いオブジェクトを取り除きます。
+   (デフォルトは2週)デフォルトの設定はオンです。
+
+--no-prune
+  古いオブジェクトを取り除きません。
+</pre>
+</p>
+
+
+
+
+</body>
+
+</html>

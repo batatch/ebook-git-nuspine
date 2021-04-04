@@ -1,0 +1,2027 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>3.　Gitの使い方 / 3.1　基本的な使い方</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+<a name="c3" />
+<h1>3.　Gitの使い方</h1>
+
+
+<a name="c3-1" />
+<h2>3.1　基本的な使い方</h2>
+
+
+<a name="c3-1-1" />
+<h3>3.1.1　リポジトリを作る</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+ほな、gitを使って開発していこか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+いよいよ、実践というわけですね！
+</div>
+
+<div>
+<b>ナス　　</b>
+なんや、目が輝いてるなぁ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+私って、なんでも実践して身につけるタイプなんです。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうか、そりゃええ心がけや。ほんなら、びしばしいくでぇ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+よろしくお願いします。先生！
+</div>
+
+<div>
+<b>ナス　　</b>
+(先生かぁ。ええ、ひびきや。)
+</div>
+
+<div>
+<b>ナス　　</b>
+まず、最初にやることはリポジトリを作ることや。<br/>
+CVSやSubversionなどの他の管理ツールは、１つのリポジトリを共有するよって、
+共有サーバなどに管理者に作ってもらわなあかんかったんやけど、gitは一人一人がリポジトリを持つ分散管理やから、
+とりあえず、自分だけのジトリ作るところから始められるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+自分専用のリポジトリなんですね。
+でも、あとからみんなで共有できるのかなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ええところに気がついたな。<br/>
+最初は自分専用で初めても、あとからメンバとの共有はできるよって、心配せんでええで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+それじゃあ、安心ですね。
+はじめは個人で始められるのは、手軽でいいですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+スタートアップが簡単ってことや。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+まずは、適当にディレクトリ作ろうか。普通はプロダクト名とかにするんやけど。<br/>
+おお、そういやいうてなかったけど、今回、うちの部門でキャッシュサーバ(*1) の検証することになって、
+ちょうど研修も兼ねてぱいんちゃんにプロトタイプ作ってもらおうかな思てんねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええっ、それはまたいきなりですね。新人なのに大丈夫なんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+まぁ、プロトタイプやから、そんなに気張らんでもええやろ。
+プロダクト名のディレクトリは minitableとかにしとこか。
+<pre>
+$ mkdir minitable
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+ディレクトリ作ったら、そこで git initコマンドを実行したら、リポジトリ完成や。
+<pre>
+$ cd minitable/
+$ git init
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+これで、できてるんですか？何も変わってないみたいですけど。。
+</div>
+
+<div>
+<b>ナス　　</b>
+gitのリポジトリの情報は、.gitっていうディレクトリに格納されるんや。
+"." が先頭についたファイルやディレクトリは、管理情報や設定情報など大事な情報を格納してて、ドットファイルって呼ばれている。
+大事な情報やから、誤って消したりせんように、通常は見えないようになってるんや。
+lsの "-a"オプションつけたら表示できるで。
+<pre>
+$ ls -a
+.git/
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、確かに .gitっていうディレクトリありますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+ディレクトリの中身についてはおいおい説明するとして。。<br/>
+.gitのあるディレクトリには作業用のソースコードなどが展開されて、作業ツリーっていうんや。
+gitの開発は、作業ツリーのファイルをいじって、.gitのリポジトリに登録という流れになるな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+今はまだ何もファイルがない状態ですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうや。<br/>
+ほんなら、リポジトリに最初のファイルを登録しよか。
+ディレクトリの構成はこんなカンジや。
+<pre>
+minitable/
+  src/
+    minitable/
+      MiniTable.java
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+ファイルを配置したら、git add . コマンドを実行する。"."を忘れんようにな。
+<pre>
+$ git add .
+# ....
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、ファイル名が表示されてますね。これで登録できたんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+まだや。<br/>
+git add はインデックスという領域にファイルの変更を予約するだけ。
+詳しくはあとで説明するとして、git ではインデックスに変更を予約してから、コミットという手順で登録するんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+コミット？
+</div>
+
+<div>
+<b>ナス　　</b>
+コミットが実際の登録処理のことで、変更の単位のことをコミットいうたり、
+登録処理を実行することを「コミットする」いうたりするんや。
+コミットの実行は git commit や。
+<pre>
+$ git commit
+  :
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？なんかエディタが開いちゃった？
+</div>
+
+<div>
+<b>ナス　　</b>
+ここで、コミットのコメントを記入するんや。
+なぜ、これこれの変更を行ったかいう説明をちゃんと書いておくと、あとで見直すときに役に立つんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。じゃあ、ちゃんと書いておきますね。。
+</div>
+
+<div>
+<b>ナス　　</b>
+エディタを保存して終了したら、コミットが完了するで。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>この章ではgitを使う上で第一歩となるリポジトリの作成について説明していきます。
+（便宜上、リポジトリの作成から最初のコミットまでの流れを説明しますが、リポジトリの作成以外の作業については後でさらに詳しく説明します。）
+</p>
+
+<div class="fig">
+<img width="566" height="357" src="chap03-1.files/image002.png" />
+</div>
+
+
+<p>「git init」コマンドを使用して、自分専用のリポジトリを作成しています。まずはその流れについて説明します。
+
+<pre>
+$ mkdir minitable
+</pre>
+
+今回の例では、上記のコマンドを使って自分がこれから作業を行うディレクトリを、mkdirコマンドを使用して作成しました。
+</p>
+
+<p>次に、以下のコマンドで、先ほど作成したディレクトリに移動します。
+
+<pre>
+$ cd minitable/
+</pre>
+</p>
+
+<p>そして次に、このディレクトリ内でリポジトリの初期化を行います。
+
+<pre>
+$ git init
+Initialized empty Git repository in /home/gituser/minitable/.git/
+</pre>
+</p>
+
+
+<p>コマンドを実行すると、minitable内に.gitという名前の隠しディレクトリが作成されます。
+これがリポジトリとなります。.gitディレクトリの中には様々なファイルやディレクトリが作成されているはずです。
+（.gitディレクトリへ移動してls コマンドを実行することで確認できます。）
+</p>
+
+<p>.git ディレクトリの事をリポジトリと呼ぶのに対して .gitが置かれているディレクトリ(minitable)の事を
+git では作業領域といい、ここにソースファイルなどが展開されます。
+展開されたファイルツリーのことを、作業ツリーといいます。
+実際に自分が作成したプログラムファイルや、それに付随する設定ファイル、ディレクトリは、
+この作業ツリーの中に格納していき、任意のタイミングで git リポジトリにコミットすることができます。
+</p>
+
+<p>git initコマンドには他にもいくつかオプションがあります。
+その他のオプションについては 「6章」を参照して下さい。
+</p>
+
+
+<p>次に、「git add」コマンドを使用してカレントディレクトリ下のすべてのファイルのスナップショットを取得するように
+gitに依頼します ('.'があることに注意してください。)
+
+<pre>
+$ git add .
+</pre>
+</p>
+
+<p>上記のコマンドにより、minitableディレクトリにある src/ディレクトリ、minitable/ ディレクトリ、
+MiniTable.java ファイルの状態が記録されます。
+ここで、「git ls-files」コマンドを使用することで、取得されたスナップショットに src/minitable/MiniTable.java が
+記録されたことが分かります。
+
+<pre>
+$ git ls-files
+src/minitable/MiniTable.java
+</pre>
+</p>
+
+<p>「git add .」コマンドにより、minitable ディレクトリにある src/minitable/MiniTable.java ファイルの状態が
+記録されましたが、この時点ではまだリポジトリには登録されません。
+実際にリポジトリに登録するには次のコマンドを実行します。
+
+<pre>
+$ git commit
+</pre>
+</p>
+
+<p>このコマンドを実行するとエディタが起動され、コミットメッセージの入力が促されます。
+メッセージを入力しエディタを終了するとプロジェクトの新しいバージョンが記録されます。
+</p>
+
+<p>コミットメッセージの入力例
+
+<pre>
+MiniTable.javaの新規作成
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: gituser &lt;gituser@test01.(none)&gt;
+#
+# On branch master
+#
+# Initial commit
+#
+# Changes to be committed:
+#   (use "git rm --cached &lt;file&gt;..." to unstage)
+#
+#       new file:   src/minitable/MiniTable.java
+#
+</pre>
+</p>
+
+<p>コミットメッセージを入力して保存が完了すると、以下のようなメッセージが出力され、コミットが完了します。
+</p>
+
+<p>メッセージの例
+
+<pre>
+[master (root-commit) da13442] MiniTable.javaの新規作成
+1 files changed, 38 insertions(+), 0 deletions(-)
+create mode 100644 src/minitable/MiniTable.java
+</pre>
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-2" />
+<h3>3.1.2　変更内容を確認する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+gitでコード管理してたら、変更点のチェックもできるんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+変更点？
+</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃん、コーディング進んでる？
+</div>
+
+<div>
+<b>ぱいん　</b>
+まだ途中ですけど。。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、ちょっとキーボード貸してや。。git statusと。。
+<pre>
+$ git status
+
+# On branch master
+# Changed but not updated:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+ここの modifiedで表示されてるのが、変更中のファイルってわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。確かに今編集してるファイルですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+さらに、コードの差分イメージも見られるで。。git diffと。。
+
+<pre>
+$ git diff
+diff --git a/src/minitable/MiniTable.java b/src/minitable/MiniTable.java
+index 0a572c8..f8bc1b7 100755
+--- a/src/minitable/MiniTable.java
++++ b/src/minitable/MiniTable.java
+@@ -251,12 +251,12 @@ public class MiniTable {
+        public MiniTable() {
+-           this.table = null;
++           this.table = new HashMap&lt;String, String&gt;();
+        }
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+うわ、なんですか？これ。
+</div>
+
+<div>
+<b>ナス　　</b>
+これは、diffというコマンドで作られたテキスト間の差分を表現したものや。差分表現にはいくつか種類があるけど、これはユニファイド形式いうてもっとも一般的な形式やな。
+diffの出力内容は patchいうコマンドを使って、変更内容を反映させることもできるよって、パッチと呼ばれることもある。
+git にはパッチファイルで変更を反映するコマンドもあるんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+記号みたいでちょっと分かりにくいですねぇ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+簡単に説明すると、コードの先頭に "-"がついてる行が変更前の内容で、
+"+"のついてる行が変更後の内容で、"-"の行を "+"の行に変更したってことになる。<br/>
+この例やと、this.table = null; の行を this.table = new HashMap に
+変更したってことやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+"-"と "+"の行を見れば、なんとなく意味が分かりますね。
+こうやって、変更内容がチェックできるのは便利かも。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやろ？確認しながら、自分の作業を着実に進められるいうわけや
+</div>
+
+<div>
+<b>ぱいん　</b>
+堅実ですね♪
+</div>
+
+<div>　</div>
+</div>
+
+
+<div class="fig">
+<img width="566" height="375" src="chap03-1.files/image004.png" />
+</div>
+
+
+<p>現在、変更中の内容を確認するには git diffを使います。
+名前のとおり、UNIXにおけるdiffコマンドと同様の形式で差分を表示します。表示内容は次のとおりです。
+</p>
+
+
+<div class="fig">
+<img src="chap03-1.files/image005.png" />
+<p>図3.1　git diffの表示</p>
+</div>
+
+
+<p>ファイル単位の差分が並べられ、一つのファイルの差分には「@@」で始まる変更のかたまりが並びます。このかたまりをhunkといいます。後述のgit addでコミットの予約するときに、hunk単位で指定することもできます。
+</p>
+
+<p>git diffをオプションなしで実行した場合は、インデックスと作業領域の差分を表示し、--cachedをつけると、
+インデックスと最新コミット（HEAD）との差分を表示します。
+したがって、変更作業中はオプションなしで使用し、--cachedはコミット直前にコミット内容の確認に使用します。
+なお、インデックスに登録されていない追加ファイルは差分表示の対象にはなりません。
+</p>
+
+<p>また、git diffのあとにファイル名やパスの一部を指定すると、指定されたファイルの差分のみ表示します。
+
+<pre>
+$ git diff src/
+</pre>
+</p>
+
+<p>パス以外にもコミットIDやタグ、ブランチ名を指定して、特定のコミット間の差分を表示することもできます。
+
+<pre>
+$ git diff 6d4f132..c931745
+$ git diff tag20110101..tag20110204
+</pre>
+</p>
+
+<p>git diffのオプションについては、「6章」を参照してください。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-3" />
+<h3>3.1.3　変更を予約する</h3>
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+先生！切りのいいところまで修正しました。
+</div>
+
+<div>
+<b>ナス　　</b>
+なんや、なんや、どしたん？いきなり。
+</div>
+
+<div>
+<b>ぱいん　</b>
+もう。。切りのいいところまで修正したら、教えろって言ってたじゃないですかぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+おお、そうやった。ごめんごめん。
+ほな、修正内容の登録しよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+<div>
+<b>ナス　　</b>
+gitは各個人がリポジトリ持ってるよって、修正がひと段落したなぁ思たら、すぐに登録してしもてもええねんで。
+集中管理のツールやったら、しっかり動作確認しとかんと、共有してる他のメンバに迷惑かけてしまうからな。
+前にちらっと言うたけど、登録する前にまずインデックスいうところへ、変更の予約するんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git add っていうコマンドでしたっけ？
+</div>
+
+<div>
+<b>ナス　　</b>
+よう覚えてたなぁ。感心。感心。
+</div>
+
+<div>
+<b>ぱいん　</b>
+えへへ。
+</div>
+
+<div>
+<b>ナス　　</b>
+git add する前に、作業ツリーの状態を確認しとこか。git status と。。
+
+<pre>
+$ git status
+# On branch master
+# Changed but not updated:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       src/minitable/Handler.java
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+変更されたファイルが２種類表示さてるやろ。<br/>
+上の「Changed but not updated」にあるファイルは、すでに gitで管理してるファイルのうち、変更のあったものが並んでる。<br/>
+下の「Untracked files」にあるんは、新しく追加した Handler.javaというファイルで、まだ、gitには登録されてないことを示してるんや。<br/>
+で、それぞれのコメントに「use "git add .."」ってあるように、git add にファイルを指定してコミットの予約ができるっていうてくれてるんやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ほんとだ。ちゃんと読めば、次に何をすればいいのか説明してくれてるんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。<br/>
+git add は、説明どおりにファイルを指定すればええんやけど、-u っていう便利なオプションがあるんや。git add -u って実行してみ。
+
+<pre>
+$ git add -u
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+。。あれ、何も表示されないですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そしたら、git statusで状態確認してみよか。
+
+<pre>
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       src/minitable/Handler.java
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、何か変わったような。。<br/>
+そうだ、「Changed but not updated」のところが「Changes to be committed」ってなっていますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+これで MiniTable.javaは予約された状態になってるんや。<br/>
+-u オプションつけると git addは、すでに gitに登録されているファイルの更新をすべて予約してくれるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。<br/>
+でも、Handler.javaは予約されていないままですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+Handler.javaは、まだ gitで管理されてないから git add -u では勝手には予約されへんねん。
+新規にファイルを追加するときは git add &lt;file&gt; でひとつひとつ予約しよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええ～、なんだかめんどくさいですねぇ。
+git add -u みたいな、いっぺんに予約する方法ないんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+あるにはあるで。
+一番最初に gitに登録したときみたいに git add . ってやるか、git add -Aってやる方法もあるな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+じゃあ、それ使えば楽じゃないですかぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうなんやけど、ファイル追加のときは、ほんまに追加するんかちゃんと確認しながら予約した方がええねん。
+いっぺんに予約すると、エディタの中間ファイルとか、コピーの残骸とか、余計なファイルを登録してしまうこともあるよってな。
+どのファイルを git で管理してるか、ちゃんと意識しておくのが大事なんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+さすが先生！しっかりしてるんですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ま、まあな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+(乗せやすいのかな？)
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、Handler.javaも予約して、git statusしてみよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+は～い。
+
+<pre>
+$ git add src/minitable/Handler.java
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       new file:   src/minitable/Handler.java
+#       modified:   src/minitable/MiniTable.java
+#
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+Handler.javaも追加されて、「new file」ってなっていますね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+これで予約完了や。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="361" src="chap03-1.files/image007.png" />
+</div>
+
+
+<p>ここでは、変更をインデックスに保存するためのコマンドであるgit addと、
+最新のリポジトリとインデックスとの差分を確認するためのコマンドであるgit diff HEADについて詳しく説明していきます。
+</p>
+
+<p>まずはgit addについて詳しく説明していきます。
+git addはこれまでにも少し触れてきたように、「引数で指定されたファイルを
+次のコミット時にはリポジトリに登録することを宣言する」コマンドです。
+次の図に示すように、git addコマンドを実行した時点では、インデックスの領域内に指定されたファイルの変更情報が記録されますが、
+リポジトリにはまだ何も反映されていない状態です。
+</p>
+
+
+<div class="fig">
+<img width="312" height="310" src="chap03-1.files/image008.png" />
+<p>図3.2　git add実行時のインデックスとリポジトリの関係</p>
+</div>
+
+
+<p>実際にファイルの変更をリポジトリに反映させるためには、git commitコマンドを使用します。
+git commitコマンドについては、次の節で詳しく説明します。
+</p>
+
+<p>git addコマンドの最も基本的な使用方法は、以下のようになります。
+</p>
+
+<pre>
+git add &lt;ファイル名&gt;
+</pre>
+
+<p>&lt;ファイル名&gt; の部分には、インデックスへ登録したいファイル名を指定します。以下のように一度に複数のファイルを指定することもできます。
+</p>
+
+<pre>
+git add aaa.txt bbb.txt ccc.txt
+</pre>
+
+<p>また、ワイルドカードを用いたファイルの指定も可能です。
+</p>
+
+<pre>
+git add *.txt
+</pre>
+
+<p>「リポジトリを作る」の節でも登場した「git add .」というコマンドもこうしたファイル名指定の一種で、
+「このディレクトリ以下の全てのファイルの状態を記録する」という意味になります。
+</p>
+
+
+<div class="fig">
+<img width="303" height="275" src="chap03-1.files/image009.png" />
+<p>図3.3　git add &lt;ファイル名&gt; 実行時の動き</p>
+</div>
+
+
+
+<h4>git add -u</h4>
+
+<p>このオプションを用いると、「作業領域内にバージョン管理している（つまり、リポジトリに登録されている）全ての
+ファイルの状態を記録する」という意味になります。
+</p>
+
+<p>既にリポジトリに登録されている複数のファイルを変更して、
+それをリポジトリに最新バージョンとして登録しる場合などにはこうしたコマンドを使った方が便利です。
+</p>
+
+
+<div class="fig">
+<img width="311" height="277" src="chap03-1.files/image010.png" />
+<p>図3.4　git add -u 実行時の動き</p>
+</div>
+
+
+<h4>git add -A</h4>
+
+<p>このオプションを用いると、「-uと同様に作業領域内にバージョン管理しているファイルに加えて、
+現状ではバージョン管理されていない新規に作成されたファイルに関してもファイルの状態を記録する」という意味になります。
+</p>
+
+<p>※バージョン 1.6.0 以前の git では、git add -A コマンドがサポートされていません。
+</p>
+
+
+<h4>git add -p</h4>
+
+<p>このオプションを用いると、hunk単位で、1ファイルに対して複数の変更を入れた場合、
+どの変更をインデックスに登録するかを自分で指定することができます。
+</p>
+
+<p>具体的な例をあげて説明します。
+まず、git diffコマンドでインデックスとの差分を確認すると、以下のように表示されたとします。
+</p>
+
+<pre>
+$ git diff
+diff --git a/src/minitable/Handler.java b/src/minitable/Handler.java
+index e9998f9..291df7f 100644
+--- a/src/minitable/Handler.java
++++ b/src/minitable/Handler.java
+@@ -3,6 +3,7 @@ package minitable;
+ import java.util.Date;
+ import java.util.Calendar;
++import java.util.List;
+@@ -47,8 +48,8 @@ public class Handler {
+         */
+        public static int getMarkerFlag(Object value) {
+-               if (value instanceof Byte)
+-                       return Handler.MARKER_BYTE;
++               //if (value instanceof Byte)
++               //      return Handler.MARKER_BYTE;
+                if (value instanceof Boolean)
+                        return Handler.MARKER_BOOLEAN;
+</pre>
+
+<p>この例では、Javaのソースファイルに対して、
+
+<ul>
+<li>import宣言の追加（import java.util.List）</li>
+<li>if文のコメント化（行頭が//の行）</li>
+</ul>
+
+という2つの変更が加えられており、「@@ -3,6 +3,7 @@」、「@@ -47,8 +48,8 @@」という2つのhunkとして認識されています。
+</p>
+
+<p>この状態でgit add -pを実行すると、
+
+<pre>
+$ git add -p
+diff --git a/src/minitable/Handler.java b/src/minitable/Handler.java
+index e9998f9..291df7f 100644
+--- a/src/minitable/Handler.java
++++ b/src/minitable/Handler.java
+@@ -3,6 +3,7 @@ package minitable;
+ import java.util.Date;
+ import java.util.Calendar;
++import java.util.List;
+Stage this hunk [y,n,q,a,d,/,s,e,?]?
+</pre>
+
+
+最後のメッセージ部分で、1つ目のhunk（import宣言の追加）について、
+"Stage this hunk ?"（このhunkをインデックスに含めるか？）を確認してきます。
+</p>
+
+<p>ここでは、y(yes)を入力してEnterを押すと、次に
+</p>
+
+<pre>
+@@ -47,8 +48,8 @@ public class Handler {
+         */
+        public static int getMarkerFlag(Object value) {
+-               if (value instanceof Byte)
+-                       return Handler.MARKER_BYTE;
++               //if (value instanceof Byte)
++               //      return Handler.MARKER_BYTE;
+                if (value instanceof Boolean)
+                        return Handler.MARKER_BOOLEAN;
+Stage this hunk [y,n,q,a,d,/,K,g,e,?]?
+</pre>
+
+<p>2つ目のhunk（if文のコメント化）についても同様のメッセージが出力されるため、
+ここでは、n(no)を入力します。こうすることで、1つ目のhunkの情報のみをインデックスに登録することができます。
+git add の他のオプションについては、「6章」を参照して下さい。
+</p>
+
+
+<p>次に、git diff HEADコマンドについて説明していきます。
+</p>
+
+<p>gitでは、リポジトリに記録されている最新のコミットの事をHEADと呼びます。
+つまり、git diff HEADを実行すると、「作業領域と最新のコミットの差分」を表示します。
+</p>
+
+
+<div class="fig">
+<img width="305" height="313" src="chap03-1.files/image011.png" />
+<p>図3.5　git diff HEAD 実行時のインデックスとリポジトリの関係</p>
+</div>
+
+<p>上記の図からもわかるように、git diff HEAD で表示されるのはあくまで「作業領域と最新のコミットの差分」であるため、
+git addコマンドでインデックスに登録されている変更であっても、まだリポジトリに未反映の部分であれば、
+git diff HEAD の表示対象となります。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-4" />
+<h3>3.1.4　変更をコミットする</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+さっき、予約したファイルをコミットしよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+<div>
+<b>ナス　　</b>
+最初にファイル登録したときにやったけど、コミットするんは git commitいうコマンドや。<br/>
+git status で状態表示して「Changes to be committed」に並んでるファイルが登録されるんやで。事前確認はしっかりな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。ドキドキ。
+</div>
+
+<div>
+<b>ナス　　</b>
+まあ、git の場合は、あとでコミットを取り消したり、やり直したりもできるよって、そないきばらんでもええねんけどな。
+確認するに越したことはないで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、git commit してみよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。
+
+<pre>
+$ git commit
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+エディタが起動しました。ここに変更の説明書くんですよね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうや。ここに書いた説明をコミットログいうんや。
+コミットログの書き方は、こんな風に一行目に変更の概要を書いて、その下に詳細な説明書くとええねん。
+
+<pre>
+オブジェクト変換のハンドラを追加
+
+オブジェクトを保存用のバイト列に変換するハンドラを作成
+データの保存時にバイト列に変換するようにした。
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+１行で説明が済むような小さな変更やったら、１行だけ書けばええねんけどな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+タイトルと本文ってカンジですね。こうかくと分かりやすいですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+ふふふ、分かりやすいだけやないんやけどな。。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええ、何かいいことあるんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+まあ、そこはおいおい出てくるよって、楽しみにしときや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええ～、ひっぱるなぁ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+エディタ保存して、コミット完了させよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+今回は git add で変更の予約をしてから、git commitでコミットしたんやけど、git commit -a いうて、予約からコミットまでいっぺんにやってくれるオプションもあんねんで。
+ただし、この方法は新規追加のファイルはコミットしてくれへん。
+すでに gitに登録済みのファイルの更新だけを登録してくれるや。
+git commit の前に git add -u をやってくれるようなもんやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ふむふむ。
+</div>
+
+<div>
+<b>ナス　　</b>
+他には -m オプションでコメントを引数で指定することもできるな。
+git commit -m "新規追加" って実行すると、エディタでコミットログ書くのを省略できるんや。
+</div>
+
+<div>
+<b>ナス　　</b>
+コミットしたら、git show コマンドでコミットした内容を確認できるで。
+
+<pre>
+$ git show
+commit ce899af0d2d9031b523310d697115302386fde45
+Author: pine &lt;pine@example.com&gt;
+Date:   Thu Jul  7 02:30:57 2009 +0000
+
+  オブジェクト変換のハンドラを追加
+
+  オブジェクトを保存用のバイト列に変換するハンドラを作成
+  データの保存時にバイト列に変換するようにした。
+
+diff --git a/src/minitable/MiniTable.java b/src/minitable/MiniTable.java
+index 661bcec..2471e24 100644
+--- a/src/minitable/MiniTable.java
++++ b/src/minitable/MiniTable.java
+@@ -54,14 +54,17 @@ public class MiniTable {
+
++       Handler handler;
+
+ :
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+へぇ、git commitのときに書いたコミットログと、git diff の変更内容が出てくるんですねぇ。<br/>
+。。この commit のあとの変な記号はなんなのかしら？
+</div>
+
+<div>
+<b>ナス　　</b>
+これはハッシュの文字列で、コミットにつけられた ID みたいなもんやな。
+git は他のツールみたいにリビジョンで変更を管理するんやなくて、変更情報から作られたハッシュを ID にして管理してるいうことなんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ID って覚えておけばいいですね♪
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="357" src="chap03-1.files/image013.png" />
+</div>
+
+
+<p>インデックスに登録したコミットの予約内容をリポジトリへ反映させます。
+git addでインデックスにコミット予約をした状態でコマンドを実行します。
+</p>
+
+<pre>
+$ git commit
+</pre>
+
+<p>コマンドを実行するとエディタが起動するので、このコミットに対する説明を記述します。
+この説明はコミットログといい、コミットの説明は後述のgit logで履歴を参照するときに、
+何の変更を行ったかを知るのに必要な情報ですので、必ず記入しましょう。
+</p>
+
+<p>あまりダラダラと説明をするのではなく、短く簡潔にまとめるのがコツです。
+なお、コミットログは先頭の１行にサマリを記述し、詳細は１行あけてその下に記述するようにします。
+
+<pre>
+コミットの説明概要
+[空行]
+コミットの説明の詳細
+　　　：
+</pre>
+
+後述のgit logで履歴を参照するときに、履歴のサマリ表示を行うとコミットログの１行目のみ表示します。
+したがって、上記の形式でコミットログを書くようにしておくと、履歴参照で一覧を見たいときと、
+詳細を見たいときに最適な表示ができます。
+</p>
+
+<p>また、git commitには直前のコミットをやり直せるオプションがあります。
+
+<pre>
+$ git commit --amend
+</pre>
+
+コミット直後にコミットログの説明のスペルミスに気づいた場合に、
+スペルミスの修正のために新たにコミットを行うのは余計な履歴が増えるので好ましくありません。
+分散リポジトリのgitでは、リポジトリを公開（後述）するまではコミットの取り消しなど変更が可能なので、
+コミットのやり直しなどを使って、履歴をきれいに保つように心がけましょう。
+</p>
+
+<p>git commit のオプションについては「6章」を参照してください。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-5" />
+<h3>3.1.5　変更の予約をキャンセルする</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+先生～、間違って要らないファイル add しちゃったぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほほう、お約束やなぁ。(結構ドジっ子なんやろか？)<br/>
+git add . とかで間違って変更予約したファイルも、ちゃんと取り消しできるねんで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+さすが、gitちゃんは優れモノですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+git status で状態確認したら、コメントに git reset で unstage、つまり取り消しできるって書かれてる。
+
+<pre>
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       modified:   src/minitable/MiniTable.java
+#       new file:   src/minitable/MiniTable.java~
+#
+</pre>
+</div>
+
+
+<div>
+<b>ナス　　</b>
+要らんファイルはこの "~"ついてるエディタの中間ファイルやろ？<br/>
+そしたら、git reset HEAD src/minitable/MiniTable.java~ ってやってみよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git reset 。。。と。<br/>
+何も表示されないですね。じゃあ、git status 。。と。
+
+<pre>
+$ git reset HEAD src/minitable/MiniTable.java~
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       src/minitable/MiniTable.java~
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、ほんとだ。予約キャンセルできてますね！
+</div>
+
+<div>
+<b>ナス　　</b>
+なんでもやり直しは効くんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+人生みたいですね。。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="370" src="chap03-1.files/image015.png" />
+</div>
+
+
+<p>この節では、変更の予約をキャンセルするためのコマンドである git reset &lt;ファイル名&gt;について詳しく説明していきます。
+</p>
+
+<p>冒頭の会話例のように、MiniTable.java だけでなく、本来不要であるはずの MiniTable.java~ まで git add コマンドで
+インデックスに登録してしまった場合、
+
+<pre>
+git reset HEAD &lt;ファイル名&gt;
+</pre>
+
+とコマンドを入力してインデックスへの登録を取り消すことができます。
+</p>
+
+<p>&lt;ファイル名&gt; の部分を続けてスペース区切りで入力したり、
+*.javaといったようにワイルドカードを用いることで複数ファイルのインデックスからの登録キャンセルを行うこともできます。
+</p>
+
+<p>なお、git statusで現在の状態を表示すると、unstage するには git reset を使うという案内があります。
+インデックスに変更を予約することを state (ステージに上げる)、インデックスから予約を取り消すことを unstage (ステージから降ろす)ということもあります。
+</p>
+
+<p>この節では、インデックスからの登録のキャンセル方法として git reset コマンドを紹介しましたが、
+このコマンドを用いて、既にコミットしてしまった内容のキャンセルを行うこともできます（3.2.3節 参照）。
+</p>
+
+<p>git reset のオプションについては「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-6" />
+<h3>3.1.6　無視したいファイル</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+う～ん。
+</div>
+
+<div>
+<b>ナス　　</b>
+どしたんや？
+</div>
+
+<div>
+<b>ぱいん　</b>
+ビルドしたら .classファイルができるんですけど、いつも git status画面に出てきちゃって、邪魔なんですよねぇ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+そやなぁ。。まぁ、面倒やけど、仕方ないさかい、我慢してや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？どうしようもないんですか？<br/>
+いつもなら、ここで gitちゃんのすごさの語りが入るのに。。
+</div>
+
+
+<div>
+<b>ナス　　</b>
+語りって、おれは何者やねん！
+はいはい、ちゃんとありますよ。対策法が。
+</div>
+
+<div>
+<b>ぱいん　</b>
+待ってました♪
+</div>
+
+<div>
+<b>ナス　　</b>
+.classファイルのように、gitのコマンドで無視して欲しいファイルを、あらかじめ設定しとけるんや。<br/>
+.gitignoreっていうファイルに、ファイル名のパターンを記述しておくと、
+そのディレクトリ以下のパターンに一致するファイルを無視してくれるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+パターンってなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+無視したいファイルを一個一個設定してたら面倒やろ？
+拡張子が ".class"のファイルすべてっていう風に指定したいやんか。<br/>
+せやから "*.class"って書いて、ファイル名の最後が ".class"のものすべてに一致させることができるんや。
+何にでも一致する記号やから "*"をワイルドカードっていうんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ジョーカーみたいですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+実際に設定してみよか。
+.gitignoreファイルを追加する前の git statusの一覧はこうや。
+
+<pre>
+$ git status
+   :
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       src/minitable/Handler.class
+#       src/minitable/MiniTable.class
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+ここに "*.class"って書いたファイルを .gitignoreっていう名前で作るんや。
+
+<pre>
+$ cat .gitignore
+*.class
+
+$ git status
+   :
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       .gitignore
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、.classファイルがなくなりましたね。なるほどぉ。<br/>
+でも、.gitignoreファイルが追加されちゃいましたね。
+</div>
+
+<div>
+<b>ナス　　</b>
+.gitignoreファイルも gitで管理するんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうか。設定ファイルも管理対象にしておけば、メンバで共有できますもんね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。<br/>
+複数のプロジェクトで同じ設定を共有したいときに、HOMEディレクトリに ~/.gitignoreファイルを作っておくという方法もあるんやけどな。メンバ間で設定の共有が面倒になるから、プロジェクト毎に作った方がええんやないかな。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>コンパイルの中間ファイルや、エディタの編集中ファイルなど、そもそも gitの管理対象になることのないファイルが、
+git statusなどで表示されて邪魔になることがあります。
+そのような場合に、あらかじめ gitの管理対象外となるファイルのパターンを設定しておくことで、
+gitが不要なファイルを無視してくれるようになります。
+</p>
+
+<p>パターンはプロジェクト直下の .gitignoreというファイルに記述します。
+
+<pre>
+cat .gitignore
+*.class
+*~
+</pre>
+
+設定前と設定後で git statusの表示が次のように変わります。
+</p>
+
+<p>設定前
+<pre>
+$ git status
+   :
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       src/minitable/Handler.class
+#       src/minitable/MiniTable.class
+</pre>
+</p>
+
+<p>設定後
+<pre>
+$ git status
+   :
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#       .gitignore
+</pre>
+</p>
+
+<p>設定した .gitignoreファイルはコミットしてしましょう。
+そうすれば、管理対象外の設定をプロジェクトメンバで共有することができます。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-7" />
+<h3>3.1.7　履歴を参照する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃん、変更ってちゃんとコミットしてる？
+</div>
+
+<div>
+<b>ぱいん　</b>
+ちゃんと毎日コミットしてますよ♪
+</div>
+
+<div>
+<b>ナス　　</b>
+感心感心。<br/>
+せっかく gitで管理してるんやから、コミットせな損やな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+(損って。。関○人はやっぱり損得勘定なのかしら？)
+</div>
+
+<div>
+<b>ナス　　</b>
+ん？何か顔についてる？
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、あ、いや、なんでもないですよ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ちゃんとコミットしてたら、コミットの履歴を後から見られるんやで。
+
+<pre>
+$ git log
+commit beb47b58bf64499cc4ae9afc64730830743ebaf0
+Author: pine &lt;pine@3cf669a8-7060-4aab-9fe4-b46c2908ef49&gt;
+Date:   Fri Jul 10 10:55:58 2009 +0900
+
+   7/10の変更分
+
+   deleteメソッドを追加
+   Handler#encodeの修正
+
+commit 67dc7d18ea3180199b42a470534787e8de389816
+Author: pine &lt;pine@3cf669a8-7060-4aab-9fe4-b46c2908ef49&gt;
+Date:   Wed Jul 8 17:40:00 2009 +0900
+
+   コミット忘れ追加
+
+commit 5d9b0010a7be23c2c7b6e800444e3ed30cf16c77
+Author: pine &lt;pine@3cf669a8-7060-4aab-9fe4-b46c2908ef49&gt;
+Date:   Fri Jun 5 09:21:32 2009 +0000
+
+   7/9の変更分
+
+   setメソッドを修正
+   Handler#encodeの修正
+   :
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、今まで入力したコミットのログが出てくるんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやで。これで、過去の行いが暴かれてしまうんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ 。。なんかこわいなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+まあまあ。<br/>
+そんでな。こうやって今までのコミットログを確認したときに、それぞれのコミットで何をやったか分かるように注意して、
+コミットした方がええんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですねぇ。でも、具体的にはどうすればいいのかしら？
+</div>
+
+<div>
+<b>ナス　　</b>
+たとえば、ぱいんちゃんのコミットの例だと、毎日コミットしてるんやけど、一回のコミットでいろんな変更してたりするやろ？
+</div>
+
+<div>
+<b>ぱいん　　</b>
+うーん、そうですねぇ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+いっぺんにいろんな変更するんやなくて、ひとつの変更ごとにまとめてコミットしておくと、コミットが修正単位になって、後から
+みたときに分かりやすくなるんや。<br/>
+コミットが修正単位になってると、あとでええこともあるしな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+修正単位でコミットを揃えるんですね。今までのコミットは失敗しちゃったなぁ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+まだ、開発始めたばかりやから、そんなに気にせんでええで。これから、心がけていけばええんや。<br/>
+コミットの単位は、プロダクトのリリースが始まったりすると、重要になってくるよって、今から慣れていったらええねんで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい、がんばります♪
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="355" src="chap03-1.files/image017.png" />
+</div>
+
+
+<p>この節では、git logコマンドについて説明します。
+git logコマンドでは、これまで実施してきたコミットの履歴をテキスト形式で画面に表示することができます。
+git logコマンドを実行すると、以下のような結果が出力されます。
+（複数のコミット履歴が存在する場合、最新のコミットが一番上に出力されます。）
+</p>
+
+
+<div class="fig">
+<img width="485" height="168" src="chap03-1.files/image018.png" />
+<p>図3.6　git logの表示内容</p>
+</div>
+
+
+<p>出力されたテキストは、以下の4つの部分から構成されています。
+</p>
+
+<ol>
+<li>コミットを一意に表現するためのID。コミットのIDはSHA-1にて生成されています。</li>
+<li>コミットを行ったユーザの名前が出力されます。</li>
+<li>コミットを行った日付と時刻が出力されます。</li>
+<li>コミットを行った際に、コミット者が入力したコメントが出力されます。</li>
+</ol>
+
+<p>git logコマンドには非常に多くの出力オプションが存在します。
+たとえば、git logをオプションなしで実行した場合、すべてのコミットの履歴が表示されますが、
+表示件数を制限したり、日付で絞り込みなどができます。表示するコミット情報の数を指定するには -n オプションを使います。
+-3 のように数字を直接指定しても同じです。
+
+<pre>
+$ git log -n 3
+commit 192b8aa0412db23ce222cf69b296848e83178282
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 19:43:07 2009 +0900
+
+    10回目のコミット
+
+commit c5403ab04e86580e7b5c6af7832cd28273032fbf
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 19:27:32 2009 +0900
+
+    9回目のコミット
+
+commit 6db92ba8d484253416df0b543804fd29dacf89ec
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 17:51:21 2009 +0900
+
+      8回目のコミット
+</pre>
+</p>
+
+
+<p>日時の範囲を指定して、コミット情報を絞り込むには --since、--untilを使います。
+それぞれ、範囲の開始日時、終了日時を指定します。
+
+<pre>
+$ git log --since="2009/8/12 16:00:00" --until="2009/8/12 17:00:00"
+commit 690c488bf1356a0bbd78288a588111c302ebe218
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 16:07:56 2009 +0900
+
+    6回目のコミット
+
+commit 7b6f41b3fd21fe298384a0f247b91e057d6f8d3a
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 16:05:54 2009 +0900
+
+    5回目のコミット
+</pre>
+</p>
+
+
+<p>古いコミット情報から順に表示するには --reverseオプションを使います。
+
+<pre>
+$ git log --reverse
+commit 470c3fa08469abe03461e0a37506dad3b94e8db0
+Author: pine &lt;pine@example.com&gt;
+Date:   Tue Aug 11 23:08:13 2009 +0900
+
+    1回目のコミット
+
+commit 431312bd407af3f4953d983096379768cc3f4cae
+Author: pine &lt;pine@example.com&gt;
+Date:   Wed Aug 12 15:52:43 2009 +0900
+
+    2回目のコミット
+</pre>
+</p>
+
+
+<p>git logの表示の絞り込み、検索については「3.2節」で詳しく紹介します。
+</p>
+
+<p>他には、コミット情報をカラー表示する --color というオプションもあります。
+コミットIDの部分が色付けされるので、コミットの区切りが分かりやすくなります。
+
+<pre>
+$ git log --color
+<span style="color: yellow;">commit e30b55e4b9ca5e4ef24797bc92b490a2ad25490b</span> ← 黄色で表示
+Author: pine &lt;pine@example.com&gt;
+Date:   Fri Aug 14 19:34:24 2009 +0900
+
+    MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+
+<span style="color: yellow;">commit da13442ba6da076cb9b4a00203d4ff8075a1867c</span> ← 黄色で表示
+Author: pine &lt;pine@example.com&gt;
+Date:   Sat Jul 25 18:14:59 2009 +0900
+
+    MiniTable.javaの新規作成
+</pre>
+</p>
+
+
+<p>また、git logはオプションなしではコミットID、著者(Author)、コミット日時、メッセージを表示しますが、
+コミット情報は他にもたくさんの情報を持っていて、表示内容をいろいろ切り替えることができます。
+通常の git logの出力に加えて、変更されたファイルの一覧を表示するには --rawオプションを使います。
+
+<pre>
+$ git log --raw
+commit e30b55e4b9ca5e4ef24797bc92b490a2ad25490b
+Author: pine &lt;pine@example.com&gt;
+Date:   Fri Aug 14 19:34:24 2009 +0900
+
+    MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+
+:000000 100644 0000000... 95a4ac5... A  src/minitable/Handler.java
+:100644 100644 851e97c... b448bcf... M  src/minitable/MiniTable.java
+</pre>
+</p>
+
+
+<p>コミットの情報とともに、変更の差分イメージも合わせて出力するには -pオプションを使います。
+
+<pre>
+$ git log -p
+commit da13442ba6da076cb9b4a00203d4ff8075a1867c
+Author: pine &lt;pine@example.com&gt;
+Date:   Sat Jul 25 18:14:59 2009 +0900
+
+    MiniTable.javaの新規作成
+
+diff --git a/src/minitable/MiniTable.java b/src/minitable/MiniTable.java
+new file mode 100644
+index 0000000..851e97c
+--- /dev/null
++++ b/src/minitable/MiniTable.java
+@@ -0,0 +1,38 @@
++package minitable;
+   :
+</pre>
+</p>
+
+
+<p>--statは、ファイルごとに変更された行数などのサマリ情報を表示します。
+
+<pre>
+$ git log --stat
+commit e30b55e4b9ca5e4ef24797bc92b490a2ad25490b
+Author: pine &lt;pine@example.com&gt;
+Date:   Fri Aug 14 19:34:24 2009 +0900
+
+    MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+
+src/minitable/Handler.java   |   52 ++++++++++++++++++++++++++++++++++++++++++
+src/minitable/MiniTable.java |    2 +
+2 files changed, 54 insertions(+), 0 deletions(-)
+</pre>
+</p>
+
+
+<p>--prettyオプションで、さまざまな表示形式に切替できます。
+コミット情報をシンプルに１行毎に表示する場合は --pretty=onlineを使います。
+表示内容はコミットIDとメッセージの先頭１行のみです。
+
+
+<pre>
+$ git log --pretty=oneline
+e30b55e4b9ca5e4ef24797bc92b490a2ad25490b MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+da13442ba6da076cb9b4a00203d4ff8075a1867c minitable.javaの新規作成
+</pre>
+</p>
+
+
+<p>--pretty=shortは通常の表示内容のうち、メッセージを先頭１行のみにします。
+
+<pre>
+$ git log --pretty=short
+commit e30b55e4b9ca5e4ef24797bc92b490a2ad25490b
+Author: pine &lt;pine@example.com&gt;
+
+    MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+
+commit da13442ba6da076cb9b4a00203d4ff8075a1867c
+Author: pine &lt;pine@example.com&gt;
+
+    MiniTable.javaの新規作成
+</pre>
+</p>
+
+
+<p>--pretty=rawでコミットの詳細を表示します。表示項目は以下のとおり。
+
+<pre>
+commit     コミットID
+tree       コミットの時点のファイルツリーを表すID
+parent     ひとつ前のコミットのID
+author     変更した人の名前 (*)
+committer  コミットした人の名前 (*)
+</pre>
+
+<blockquote>(*) 変更した人(author)とコミットした人(committer)が違う場合があります。
+例えば、コミット権限のない利用者が、修正差分をコミッタに送付して、コミットしてもらった場合など。
+</blockquote>
+</p>
+
+<p>
+<pre>
+$ git log --pretty=raw
+commit e30b55e4b9ca5e4ef24797bc92b490a2ad25490b
+tree 31e90b2d356d48c3597623c450e26c203e09e18d
+parent da13442ba6da076cb9b4a00203d4ff8075a1867c
+author pine &lt;pine@example.com&gt; 1250246064 +0900
+committer gituser &lt;gituser@test01.(none)&gt; 1250246064 +0900
+
+    MiniTable.javaにdeleteメソッドの定義を追加。Handler.javaの新規追加
+
+commit da13442ba6da076cb9b4a00203d4ff8075a1867c
+tree f125c753733863ae33f20d93e8347a399f67761f
+author pine &lt;pine@example.com&gt; 1248513299 +0900
+committer gituser &lt;gituser@test01.(none)&gt; 1248513299 +0900
+
+    MiniTable.javaの新規作成
+</pre>
+</p>
+
+
+<p>他にもいろいろな表示内容があります。
+その他の表示内容については、git logのオプションの説明「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-1-8" />
+<h3>3.1.8　ファイルを削除する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃんは、ファイルを削除するとき、どうやってる？
+</div>
+
+<div>
+<b>ぱいん　</b>
+え？普通にファイル削除してますよ。
+</div>
+
+<div>
+<b>ナス　　</b>
+せやのうて、gitの管理対象から削除するときや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、そうですねぇ。ファイルを削除してから、git add -u で予約するかなぁ。。<br/>
+ファイル削除したら、git statusで deletedってなるから、ここで git add -u したら削除の予約できますよね。
+
+<pre>
+$ rm TestClient.java
+$ git status
+# On branch master
+# Changed but not updated:
+#   (use "git add/rm &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       deleted:    TestClient.java
+
+$ git add -u
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       deleted:    TestClient.java  ★削除が予約される
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+さすが、ぱいんちゃんは優秀やなぁ。
+そうやって、削除できるわな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+えへへ。
+</div>
+
+<div>
+<b>ナス　　</b>
+でもな。gitには他にもファイル削除の方法があって、git rm ってコマンドもあんねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうなんですか？どう使うのかなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ファイルを削除して、git add -u までやってくれるだけなんやけどな。
+さっきの例を、git rm でやるとこうなる。
+
+<pre>
+$ git status
+# On branch master
+nothing to commit (working directory clean)
+
+$ git rm TestClient.java
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       deleted:    TestClient.java
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ほんとですね。git rm 使うとインデックスに登録された状態になるんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+コマンドの実行を１ステップ省略できるよって、ちょっと楽になるで。<br/>
+他にも --cachedつけて、インデックス上のファイルだけ削除っていうのもできるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ん？どういうことですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+普通に git rm で削除すると、作業ツリーのファイルも削除されて、インデックスに削除の予約されるやろ？<br/>
+せやけど、作業ツリーのファイルを残しておきたいってときに、インデックスへの削除の予約だけするってことができるんや。
+
+<pre>
+$ ls
+...    TestClient.java
+
+$ git rm --cached TestClient.java
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       deleted:    TestClient.java  ★削除の予約がされている
+
+$ ls
+...    TestClient.java  ★作業ツリーのファイルは残っている
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+へぇ、作業ツリーのファイルはそのまま残ってるんですね。<br/>
+元のファイルが残っていたら、作業のやり直しができていいかもしれないですね♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="375" src="chap03-1.files/image020.png" />
+</div>
+
+
+<p>ファイルを削除するには git rm を使います。
+これは内部でファイルを削除し、git add でファイル削除をインデックスへ登録しています。
+</p>
+
+<p>--cachedをつければ、インデックスへの登録のみ行うので、元ファイルは削除されずに残ります。
+作業のやり直しが必要な場合や、作業には必要だがリポジトリの管理対象から外したいという場合に便利です。
+</p>
+
+<p>git rm のオプションについては「6章」を参照してください。
+</p>
+
+
+</body>
+
+</html>

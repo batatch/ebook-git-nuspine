@@ -1,0 +1,1242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>3.4　ブランチで並列作業</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c3-4" />
+<h2>3.4　ブランチで並列作業</h2>
+
+
+<a name="c3-4-1" />
+<h3>3.4.1　ブランチを作る</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+masterとか originって何か、まだ教えてもらってなかったですよね？
+確か、ブランチとかなんとか。。
+</div>
+
+<div>
+<b>ナス　　</b>
+おお、そうやったな。
+いよいよぱいんちゃんにもブランチを教える時が来たか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんだか真髄っぽいですね。どきどき。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+ブランチはコミットの系統のことやねん。<br/>
+系統図を書くと、木の枝のように見えるよって「ブランチ」いうんやな。
+ちなみに、Subversionではメインの系統のことを「枝」に対する「幹」という意味で「トランク(trunk)」っていうんや。
+
+<div class="fig">
+<img width="358" height="335" src="chap03-4.files/image001.png" />
+<p>図3.22　ブランチのイメージ</p>
+</div>
+
+系統図を描くときは、左から右か、下から上へ時系列に描くんや。
+
+<div class="fig">
+<img width="566" height="276" src="chap03-4.files/image004.jpg" />
+<p>図3.23　コミットの系統図の描き方</p>
+</div>
+
+</div>
+
+<div>
+<b>ぱいん　</b>
+コミットの系統が木の枝に見えるから「ブランチ」って言うんですね。
+なんだか家系図みたいですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう、家系図と同じでどれかのブランチを親にして、新しいブランチを作っていくんやで。
+ブランチを作るには git branch コマンドを使う。
+<pre>
+$ git branch
+* master
+$ git branch branch1
+$ git branch
+* master
+  branch1
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+オプションなしの表示はブランチの一覧ですね。
+"*" っていうのはなんだろう？
+</div>
+
+<div>
+<b>ナス　　</b>
+"*" は現在のブランチを表してるんや。
+現在の～っていうのは、今チェックアウトしてるツリーのブランチで、コミットなどの対象になる。<br/>
+今は、master ブランチに "*" がついてるから、git commit したら masterブランチにコミットされるわけや。
+masterは最初に用意から用意されてて、通常はメインのブランチにする。ちょうどSubversionの trunkみたいなやな。
+ちなみに、ブランチ作るときは git branch を実行したときの現在のブランチを元に新しいブランチを作ることになるで。
+この例の場合は、master を元に branch1 っちゅーブランチを作ったわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+他のブランチで作業したいときはどうするんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+複数のブランチを使うときは、現在のブランチを切替ながら作業するんや。
+ブランチの切替には git checkoutを使う。
+<pre>
+$ git checkout branch1
+$ git branch
+* master
+  branch1
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ？git checkoutって、作業ツリーの変更を取り消すときに使いましたよね？
+</div>
+
+<div>
+<b>ナス　　</b>
+リポジトリからファイルを取り出すことを「チェックアウト」いうんや。
+つまり、git checkoutはリポジトリのツリーの内容を作業ツリーに展開するコマンドというわけ。<br/>
+せやから、git checkout &lt;file&gt; でファイルのパスを指定したら、
+指定したファイルをリポジトリから取り出して作業ツリーに展開するから、
+作業ツリーの変更を取り消したように見えるし、git checkout &lt;branch&gt; でブランチ指定したら、
+指定したブランチをリポジトリから取り出して展開するよって、ブランチを切り替えたように見えるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+同じコマンドで、別の作業をしてるみたいで、混乱しそう。。
+</div>
+
+<div>
+<b>ナス　　</b>
+表面的な用途だけやなくて、コマンドが何をしてるのか理解しとかんとややこしいかもなぁ。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="419" src="chap03-4.files/image006.png" />
+</div>
+
+
+<p>ソースコード管理ツールを使った開発では、並列作業が容易になります。
+ツールを使わない場合は、ファイルのコピーを作って管理していましたが、
+gitでは、ツールが作業対象のファイルの切替などをサポートしてくれます。
+</p>
+
+<p>gitは変更をコミットという単位で、履歴を系統立てて管理していて、この系統の支流を作ることで並列作業をしやすくします。
+この支流のことを「ブランチ」といい、ちょうど木の枝が分かれていくようにコミットの履歴が分岐していくのでこのように呼ばれています。コミットは必ずどれかのブランチに含まれます。
+</p>
+
+<p>今まで説明していませんでしたが、「master」はリポジトリ作成時に自動で作られるブランチの名前で、
+これまでのコミットはこの「master」に登録されていました。
+</p>
+
+
+<h4>git branch</h4>
+
+
+<p>新しくブランチを作るには git branch コマンドを使います。
+<pre>
+git branch &lt;ブランチ名&gt;
+</pre>
+</p>
+
+<p>git branch は現在のブランチから派生する形で、新しいブランチを作成します。
+</p>
+
+<p>ここで「現在のブランチ」というのは、作業ツリーに展開されているコミットの系統のことで、
+作業領域は通常どこかのブランチに位置します。
+現在のブランチを確認するには、git branch をオプションなしで実行します。
+<pre>
+$ git branch
+* master
+</pre>
+</p>
+
+<p>または、git status の出力の先頭行にも現在のブランチが表示されます。
+<pre>
+$ git status
+# On branch master   # 現在は「master」ブランチにいる
+   :
+</pre>
+</p>
+
+<p>新しくブランチを作って、現在のブランチを新しいブランチに移動するには git checkout を使います。
+<pre>
+$ git checkout -b newbranch   # ブランチを作成して現在のブランチを移動
+$ git branch
+  master
+* newbranch   # 現在は「newbranch」にいる
+</pre>
+</p>
+
+<p>これはブランチの作成と移動をまとめて実行していて、ちょうど以下のコマンドを実行したことになります。
+<pre>
+$ git branch newbranch    # 新しいブランチを作成
+$ git checkout newbranch  # 現在のブランチを移動
+</pre>
+</p>
+
+<p>ブランチを作成しただけでは、作成元のブランチと作成したブランチはそれぞれ同じコミットをHEADで参照しています。
+</p>
+
+
+<div class="fig">
+<img width="246" height="116" src="chap03-4.files/image008.jpg" />
+<p>図3.24　ブランチ作成直後のコミット</p>
+</div>
+
+
+<p>git log でコミットの履歴を見てみると、同じコミットが先頭にあるのが分かります。
+<pre>
+$ git checkout master                    $ git checkout newbranch
+$ git log -1                             $ git log -1
+commit a3ccff3d....   &lt;-同じコミット -&gt;  commit a3ccff3d....
+</pre>
+</p>
+
+<p>では、newbranch に変更をコミットしてみましょう。
+<pre>
+$ git checkout newbranch  # newbranchに移動
+(edit)
+$ git commit ..
+</pre>
+</p>
+
+<p>git log で履歴を見ると、newbranch の先頭に新しくコミットが追加されているのが分かります。
+</p>
+
+
+<div class="fig">
+<img width="479" height="193" src="chap03-4.files/image009.png" />
+</div>
+
+
+<p>コミットの系統を図で表すと次のようになります。
+</p>
+
+
+<div class="fig">
+<img width="336" height="117" src="chap03-4.files/image011.jpg" />
+<p>図3.25　ブランチにコミットを追加</p>
+</div>
+
+
+<p>また、master に別の変更をコミットしてみると、２つのブランチの先頭がそれぞれ異なるコミットになるのが分かります。
+<pre>
+$ git checkout master  # masterに移動
+(edit)
+$ git commit ..
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="315" height="192" src="chap03-4.files/image014.jpg" />
+<p>図3.26　masterにコミットを追加</p>
+</div>
+
+
+<p>ここまでは、現在のブランチの最新のコミットを起点に新しいブランチを作っていましたが、
+過去のある時点のコミットから分岐させるには、コミット(もしくはタグ)を指定します。
+<pre>
+$ git branch newbranch2 7b305c6a....
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="322" height="149" src="chap03-4.files/image016.jpg" />
+<p>図3.27　過去の時点からブランチを作成</p>
+</div>
+
+
+<p>ブランチを使うとこのようにコミットの履歴を分岐させることができ、作業を並列化することができるのです。
+ブランチの名前を変更するには、-m、もしくは -M オプションを使います。
+<pre>
+git branch -m &lt;元のブランチ名&gt; &lt;変更先ブランチ名&gt;
+</pre>
+</p>
+
+<p>変更先のブランチと同名のブランチが存在していた場合は -M で強制的に上書きします。
+また、ブランチを削除するには -d、もしくは -D オプションを使います。
+<pre>
+git branch -d &lt;削除するブランチ名&gt;
+</pre>
+</p>
+
+<p>ただし、指定したブランチにマージされていないコミットがあると削除できません。
+-D を使うと強制的に削除します。
+</p>
+
+<p>ブランチのマージとは、２つのブランチにそれぞれ登録されたコミットを１つのブランチ上に統合することで、
+通常、ブランチによる並列作業の最後に、生成元のブランチへマージすることで作業完了となります。
+マージについては 「3.4節」で説明します。
+その他の git branch のオプションについては 「6章」を参照して下さい。
+</p>
+
+
+<h4>git show-branch</h4>
+
+
+<p>ブランチの情報を参照するには、git show-branch というコマンドもあります。
+<pre>
+$ git checkout master  # masterへ移動
+$ git show-branch
+* [master] master コミット1
+ ! [newbranch] newbranch コミット1
+--
+ + [newbranch] newbranch コミット1
+*  [master] master コミット1
+||
+|+-- newbranch に含まれるコミットに "+"
++--- master に含まれるコミットに "*"
+</pre>
+</p>
+
+<p>"--"で区切られた上段にブランチのリストと、下段にブランチに含まれるコミットを表示します。
+例では現在のブランチの master に "*" がつけられ、下段のコミットの一覧のうち master に含まれるものには "*" がついています。
+</p>
+
+<p>現在のブランチ以外のブランチでは、上段のブランチ名と、下段のブランチに含まれるコミットは同じインデントで表示され、
+それぞれ "!"、"+" がつけられます。
+git show-branch のその他のオプションについては 「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-4-2" />
+<h3>3.4.2　あとからブランチ</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+ブランチの使い方覚えたら、これからは変更する前にブランチ作るようにしたら便利やで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え？どういうことですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ある機能の追加とか、すぐには終わらない規模の変更してるときに、その機能に関係ないバグの報告受けたり、
+見つけたりすることあるやろ？
+</div>
+
+<div>
+<b>ぱいん　</b>
+ああ、ありますねぇ。<br/>
+それぞれ変更を分けてコミットするの手間なんですよねぇ。
+変更するファイル被ってなければ、インデックスに登録するに区別すればいいんですけど。。
+</div>
+
+<div>
+<b>ナス　　</b>
+おお、ぱいんちゃん、きちんとコミット分けてるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、先生がコミットは変更毎に分けてって言ったんですよ。コミット区別してないんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+え、ああ、いや、その。。(やばっ、たまに手抜いてるなんて言われへん状況や)<br/>
+変更区別するの面倒で、いっぺんにコミットしたなることあるよなってことや。
+そういうときに、変更毎にブランチ作って作業するようにしてたら、割り込みで別の作業したいときはブランチを切り替えれば、
+前の作業と独立させて作業できるんや。
+割り込みなら git stash 使ってもええんやけど、あれはリポジトリに登録済みのファイルの更新を退避するよって、
+ファイルの追加がある場合にはうまくいかんし。
+ブランチ使えば、リポジトリがローカルやから、作業終わったらマージして、ブランチ削除すればええしな。
+</div>
+
+<div class="fig">
+<img width="566" height="371" src="chap03-4.files/image018.jpg" />
+<p>図3.28　作業ツリーの変更をブランチ間で持ちまわる</p>
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですね。ローカルでの作業なら気軽にブランチ作ったり、消したりできますね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+Subversionとかやと、みんなでリポジトリ共有するよって、頻繁にブランチ作ったり、消したりできないこともあるからなぁ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、ということは、今の変更もブランチ作っておけばよかったなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+なんか作業してるん？
+ブランチは後からでも作れるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、そうなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+作業ツリーやインデックスの状態を持ったまま、ブランチ間を移動できるんや。
+今、master上で変更中やとするやろ。。
+<pre>
+$ git status
+# On branch master                    # 現在のブランチは master
+# Changed but not updated:
+#       src/minitable/MiniTable.java  # 変更中のファイル
+# Untracked files:
+#       src/minitable/Logger.java     # 追加するファイル
+</pre>
+
+ここで、ブランチを作って現在のブランチを変更すればええんや。
+
+<pre>
+$ git checkout -b add_logger          # 変更のテーマを名前にしてブランチを作る
+M       src/minitable/MiniTable.java
+Switched to a new branch "add_logger" # ブランチが切り替わる
+
+$ git status
+# On branch add_logger                # 変更用のブランチに変わっている
+# Changed but not updated:
+   :
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ブランチ変わってますね。これでコミットすれば、masterは変更前の状態を維持できるんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。<br/>
+変更をちゃんと完結させてから masterに反映するようにしておけば、masterはいつでも動く状態にできるやろ。
+変更作業中に急にデモとか動作確認頼まれても安心や。
+変更用のブランチから masterへのマージはあとで説明するな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。<br/>
+あ、でも変更用のブランチにもコミットできない中途半端な状態のときはどうするんだろ？
+ブランチ切り替えても、作業ツリーはそのままなんですよね？
+</div>
+
+<div>
+<b>ナス　　</b>
+するどいなぁ。そういうときはとりあえずコミットしてしまうねん。
+<pre>
+$ git status
+# On branch add_logger     # 変更用ブランチにいる
+  :
+$ git add ...
+$ git commit ...           # 途中の状態でもとりあえずコミット
+
+$ git checkout master      # masterに切替
+
+～デモや動作確認～
+
+$ git checkout add_logger  # 変更用のブランチに戻す
+$ git reset HEAD^          # とりあえずのコミットを取り消し
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+そっか。仮にコミットして後から取り消せばいいのかぁ。
+さすが先生♪
+</div>
+
+<div>
+<b>ナス　　</b>
+ひさしぶりのよいしょやな♪<br/>
+ちなみに、変更毎に作るブランチのことをトピックブランチっていうんやで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="422" src="chap03-4.files/image020.png" />
+</div>
+
+
+<p>git を使った開発では、変更のテーマごとにブランチを作り、そのブランチ上で変更を完結させてから、
+メインのブランチ（masterなど）に統合するというスタイルが取られます。
+そうすることによって、メインのブランチは常に完結した状態を維持でき、リリースや、
+割り込みの作業にうまく対応できるようになります。
+とくに、機能の追加や実験的な変更など、すぐに完結しない変更を行う場合には、別のブランチ上で作業するといいでしょう。
+</p>
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image022.png" />
+<p>図3.29　別ブランチを使った作業の流れ</p>
+</div>
+
+
+<p>作業が完了したら、メインのブランチにマージして、作業用のブランチが不要になったらブランチを
+削除してしまいましょう。(マージについては 「3.4節」を参照)
+
+<pre>
+$ git merge workbranch1
+</pre>
+</p>
+
+<p>実験的な作業などでマージせずにブランチを破棄したい場合は、-d では削除できないので -D オプションを使います。
+
+<pre>
+$ git branch -d workbranch1   # マージしていない変更があると削除できない
+error: The branch 'workbranch1' is not an ancestor of your current HEAD.
+If you are sure you want to delete it, run 'git branch -D workbranch1'.
+
+$ git branch -D workbranch1   # 強制的にブランチを破棄する
+</pre>
+</p>
+
+<p>なお、作業を始める前にブランチを作成していればいいのですが、
+割り込みなどで作業の途中にブランチを作っておけばよかったと思うことがあります。
+そういう場合にも、あとからブランチを作ることができます。
+作業領域に未コミットの変更があっても、ブランチを切り替えることができます。
+
+<pre>
+$ git status
+# On branch master                    # 現在のブランチは master
+# Changed but not updated:
+#       File1.txt                     # 変更中のファイル
+# Untracked files:
+#       File2.txt                     # 追加するファイル
+
+$ git checkout -b newbranch           # 変更のテーマを名前にしてブランチを作る
+M       File1.txt
+Switched to a new branch "newbranch"  # ブランチが切り替わる
+</pre>
+</p>
+
+<p>git branch &lt;ブランチ名&gt; で既存のブランチへ移動することもできます。
+
+<pre>
+$ git branch oldbranch  # 既存のブランチに切替
+</pre>
+</p>
+
+<p>ただし、変更中のファイルがある場合、現在のブランチと切替先のブランチのファイルが一致していないと、
+ブランチの切替はできません。これは、変更元のファイルの状態が異なるためです。
+
+<pre>
+$ git checkout oldbranch
+error: You have local changes to 'File1.txt'; cannot switch branches.
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="373" src="chap03-4.files/image024.jpg" />
+<p>図3.30　変更元が異なるとブランチ切り替えに失敗</p>
+</div>
+
+
+<p>上記のようにブランチ切替ができない場合は、git stash を併用する方法があります。
+作業領域の変更を stash に退避し、ブランチ切替後に元に戻します。
+
+<pre>
+$ git stash              # 作業領域の変更を退避
+$ git branch oldbranch   # 既存のブランチに切替
+$ git stash apply        # 退避した変更を適用
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image026.jpg" />
+<p>図3.31　stash を併用</p>
+</div>
+
+
+<p>ブランチ切替前後で変更元のファイルの状態が異なるため、git stash apply 時に衝突が発生する場合があります。
+この場合、衝突したファイルは git status で unmerged 状態となるので、衝突した部分は手で直してコミットします。
+</p>
+
+<p>git stash を使う以外にも、一時的に変更をコミットしてしまう方法があります。
+たとえば、すぐに完了するつもりで masterで作業を進めていたけど、
+途中ではまってしまったのでブランチを作っておけばよかったというときに使える方法です。
+
+<pre>
+$ git commit                 # 作業領域のやりかけの作業を仮コミット
+$ git branch newbranch       # newbranch は仮コミットした最新の状態
+
+$ git log                    # やりかけの作業の開始時点を git log で確認して
+$ git reset --hard master~2  # masterの履歴を戻す(例として２世代戻る)
+
+$ git checkout newbranch     # 変更用に作ったブランチに移動
+$ git reset HEAD^            # 先頭の仮コミットを取り消し
+</pre>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image028.png" />
+<p>図3.32　あとからブランチを作成</p>
+</div>
+
+
+<p>git は Subversionなどの中央集権型のツールに比べて、変更毎にブランチを作成・削除したり、
+あとからブランチを作るなど、柔軟にブランチを扱うことができます。
+このため、より並列作業がしやすくなっているといえます。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-4-3" />
+<h3>3.4.3　ブランチのマージ</h3>
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+ブランチのマージの仕方説明してなかったな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですね。<br/>
+さっき、変更用ブランチでの作業が終わったので、ちょうどよかった♪
+</div>
+
+<div>
+<b>ナス　　</b>
+ナイス・タイミングやな。<br/>
+変更用ブランチの内容を masterにマージするには、git mergeすればええで。
+
+<pre>
+$ git branch
+  add_logger
+* master                # 現在のブランチは master
+$ git merge add_logger  # add_loggerブランチからマージ
+Updating 7b305c6..510728c
+Fast forward
+  :
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+git mergeのオプションで指定したブランチを、現在のブランチにマージするんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+今回は masterからブランチを作ったあとに、masterに変更がなかったよって、
+単にコミットの履歴が進められたようになってるんや。
+
+<div class="fig">
+<img width="508" height="240" src="chap03-4.files/image029.png" />
+</div>
+
+こういうマージのことを「Fast forward」っていうんやで。
+</div>
+
+
+
+<div>
+<b>ぱいん　</b>
+add_loggerのHEADが、そのまま masterのHEADになるイメージなのかな。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。HEADの位置が変わるだけで、変更内容のマージは発生せえへんよって速い(Fast)わけや。<br/>
+でも、普通はブランチの生成元(master)に変更が入ってるやろうから、そういうときはマージコミットが作られる。
+git pullのときと同じやな。
+
+<pre>
+$ git merge add_logger
+Merge made by recursive.
+  :
+</pre>
+
+<div class="fig">
+<img width="509" height="240" src="chap03-4.files/image030.png" />
+</div>
+
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうか。git pullのときもマージしましたね。
+マージコミットは２つの親コミットを持つ(ここではPとB)んでしたよね？
+</div>
+
+<div>
+<b>ナス　　</b>
+お、さすがやなぁ。<br/>
+実は git pullでは、内部で git mergeをやってるよって、マージ処理自体は同じなんや。
+衝突が発生した場合は勝手にマージコミットは作られんから、unmergedのファイルを修正して
+git add、git commitするっていうのも一緒やで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+それから、マージ処理にはもうひとつの方法があるんや。これは gitの目玉機能なんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え？目をどうするんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ちゃうがな。人気の機能ってことや。<br/>
+git rebaseゆうてな。ブランチの生成元のコミットを変更できるねん。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ん？。。先生、意味が分かりません！
+</div>
+
+<div>
+<b>ナス　　</b>
+ブランチの生成元、たとえば masterにブランチ生成後にコミットがあると、マージコミットができて、
+Fast forwardにならんかったよな。<br/>
+もし、このブランチが masterのHEAD(最新)から生成されてたら、Fast forwardになるわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、確かにそうですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+git rebaseはそういう状態を作ってしまうんや。まずはブランチの方で git rebaseを実行する。
+
+<pre>
+$ git checkout add_logger  # 変更用ブランチに移動
+$ git rebase master        # 生成元の masterを指定して rebase
+First, rewinding head to replay your work on top of it...
+  :
+</pre>
+
+これで変更用ブランチの生成元が、今の masterのHEADになるんや。
+
+<div class="fig">
+<img width="510" height="240" src="chap03-4.files/image031.png" />
+</div>
+
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええーっ、すごいですねぇ。なんだか不思議な感じです。
+</div>
+
+  
+
+<div>
+<b>ナス　　</b>
+そうやなぁ。過去が変わるわけやもんなぁ。<br/>
+rebaseは内部で、masterのHEAD(ここではP)から新しくブランチを作って、それに A、Bの変更を適用して、
+新しい add_loggerにしてるんや。<br/>
+新しいブランチに add_loggerのコミットをひとつずつマージするわけやから、変更内容が被ってる場合はここで衝突が起きるんや。<br/>
+たとえば、A のコミットで衝突が起きると、一旦 rebaseが中断される。
+ここで手で衝突を修正するんや。
+マージの unmergedファイルの修正と一緒やで。<br/>
+git mergeのときは unmergedを修正したあとは git add、git commitってやるけど、rebaseのときは、
+
+<pre>
+$ git rebase --continue
+</pre>
+
+ってやると、A のマージが完了して、次に Bのマージへ進める。
+マージが多すぎて rebaseを断念する場合は、--abortで止めることもできるんや。
+
+<pre>
+$ git rebase --abort
+</pre>
+
+rebaseが完了したら、masterにマージするのは Fast forward でさくっと完了や。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうか。ブランチ間に衝突がある場合は、git merge時に修正するか、
+git rebase使って変更用ブランチ上で解消しておくかってことなんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+rebaseやと、masterを分岐のない１本の履歴にできて、マージコミットも入らないから履歴をきれいに保つことができる。<br/>
+せやけど、rebaseで個々のコミットの手動マージがたくさん発生するようやと、
+mergeでいっぺんにマージしてもうた方が楽な場合もあるな。<br/>
+どっちか楽な方法でやればええと思うで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="420" src="chap03-4.files/image033.png" />
+</div>
+
+
+<p>別のブランチでの変更を統合することを「ブランチをマージする」といいます。
+通常、ブランチでの作業は完成した変更を、分岐元のブランチにマージすることで作業完了となります。
+ブランチのマージには git merge コマンドを使います。
+
+<pre>
+git merge &lt;マージ対象のブランチ&gt;
+</pre>
+</p>
+
+<p>git merge は指定したブランチの内容を、現在のブランチに統合します。
+</p>
+
+<p>マージでは、対象のブランチと現在のブランチの履歴を照会し、
+ブランチ作成時点以降のコミット(対象のブランチにあって、現在のブランチにない)を現在のブランチに取り込みます。
+</p>
+
+<p>最後にマージ結果として双方のブランチから２つの親を持つコミット(マージコミット)が作られます。
+
+<pre>
+$ git merge newbranch
+Merge made by recursive.
+ File.txt |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+</pre>
+</p>
+
+<p>このとき、現在のブランチのコミットがすべて、マージ対象のブランチに存在する場合、
+つまり、ブランチの作成以降、分岐元のブランチに何もコミットされていない場合は、
+特別なケースとして「Fast forward」という処理を行います。
+Fast forward は現在のブランチの先頭を、マージ対象のブランチの先頭に移動するだけなので、コミットが作られません。
+
+<pre>
+$ git merge newbranch
+Updating 7b305c6..510728c    # Fast forward の場合
+Fast forward
+ File.txt |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image035.png" />
+<p>図3.33　マージと Fast forward</p>
+</div>
+
+
+<p>マージは複数の変更をまとめるため、同じファイルに対して異なる変更が行われている場合には
+衝突(CONFLICT)が発生します。
+
+<pre>
+$ git merge newbranch
+Auto-merging File.txt
+CONFLICT (content): Merge conflict in File.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+$ git status
+File.txt: needs merge
+# Changed but not updated:
+#       unmerged:   File.txt   # 衝突の発生したファイルは「unmerged」となる
+</pre>
+</p>
+
+<p>衝突が発生しなかった場合には、マージ後に自動でコミットが行われますが、
+衝突が発生した場合は手で競合部分を修正してコミットを行います。
+
+<pre>
+(unmerged のファイルを修正)
+$ git add File.txt  # 修正したファイルをインデックスに追加
+$ git commit        # マージコミットを登録
+</pre>
+</p>
+
+<p>衝突の解決方法は「3.3節」の git pull の場合と同様です。
+実は、git pull は内部で git merge を行っているので、以下のコマンドはほぼ同じ処理を意味します。
+
+<pre>
+git merge &lt;ブランチ名&gt;
+git pull . &lt;ブランチ名&gt;
+</pre>
+</p>
+
+<p>git pull に "." を指定すると、現在のリポジトリをリモートリポジトリとして扱います。
+
+<pre>
+$ git pull . newbranch
+From .
+ * branch            newbranch   -> FETCH_HEAD
+Updating 7b305c6..510728c
+Fast forward
+ File.txt |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+</pre>
+</p>
+
+<p>なお、git pull の内部処理では、マージの前にリモートリポジトリのコミットをダウンロードします。
+git clone でリポジトリを作成した場合には、ダウンロードしたコミットを取り込むための特殊なブランチが作られていて、
+git branch -r で確認することができます。
+
+<pre>
+$ git branch -r
+  origin/HEAD
+  origin/master
+</pre>
+</p>
+
+<p>これをリモートブランチといい、git pull は以下の２つの処理を行っています。
+</p>
+
+<ul>
+<li>リモートリポジトリからコミットをダウンロードし、リモートブランチを更新</li>
+<li>リモートブランチから、ローカルブランチへマージ</li>
+</ul>
+
+<p>リモートブランチは git fetch というコマンドで更新するので、git pull は次の２つのコマンドと同等となります。
+
+<pre>
+git fetch
+git merge origin/master
+</pre>
+
+<p>ただし、リモートブランチはリモートからコミットを取り込むためのブランチなので、
+直接チェックアウトすることができません。
+ブランチのマージには git merge コマンドの他に、git rebase というコマンドがあります。
+
+<pre>
+git rebase &lt;上流のブランチ名&gt;
+</pre>
+</p>
+
+<p>git merge は現在のブランチの先頭に、対象のブランチのコミットを取り込みますが、
+git rebase は現在のブランチの生成時点を、上流のブランチ(生成元のブランチ)の先頭に進めます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="351" src="chap03-4.files/image037.jpg" />
+<p>図3.34　git merge と git rebase</p>
+</div>
+
+
+<p>git rebaseは、現在のブランチを、あたかも上流のブランチの最新の状態から作成したように更新するため、
+変更の履歴が分かりやすくなります。
+今までの Subversionなどにはなかった機能で、git rebaseを使うために gitを採用することもあるようです。
+</p>
+
+<p>git rebaseは、現在のブランチの生成時点から、最新までのコミットをひとつずつ、
+生成元のブランチの最新バージョンから生成したブランチにマージしていきます。
+git mergeと同様、衝突が発生すると git rebaseの処理が中断され、unmerged のファイルを手で修正しなければいけません。
+
+<pre>
+$ git checkout newbranch   # masterから生成した newbranchを更新する場合
+$ git rebase master        # 上流の masterから rebase
+First, rewinding head to replay your work on top of it...
+Applying: newbranch 1
+error: patch failed: File.txt:1
+error: File.txt: patch does not apply
+Using index info to reconstruct a base tree...
+Falling back to patching base and 3-way merge...
+Auto-merging File.txt
+CONFLICT (content): Merge conflict in File.txt  # rebase中に衝突が発生
+Failed to merge in the changes.
+Patch failed at 0001.
+
+When you have resolved this problem run "git rebase --continue".
+If you would prefer to skip this patch, instead run "git rebase --skip".
+To restore the original branch and stop rebasing run "git rebase --abort".
+</pre>
+</p>
+
+<p>git rebaseの処理中は特殊な状態にあり、rebase が中断した場合は、次の３つの対応のいずれかを選択します。
+</p>
+
+<ul>
+<li>中断する(途中までのマージ作業も破棄)　　→  git rebase --abort</li>
+<li>このコミットをスキップ　　　　　　　　　　　　→  git rebase --skip</li>
+<li>衝突を解消して、rebaseを継続　　　　　　　→  git rebase --continue</li>
+</ul>
+
+<p>git mergeでは、衝突を修正したら git addして、git commit していましたが、
+git rebase の場合は --continueオプションで rebaseの継続を指示します。
+
+<pre>
+$ git rebase --continue
+</pre>
+</p>
+
+<p>現在の衝突の発生したコミットを破棄して、次のコミットのマージへ進む場合は --skip オプションをつけて実行します。
+
+<pre>
+$ git rebase --skip
+</pre>
+</p>
+
+<p>途中までのマージ作業も破棄して、git rebase 自体を取りやめる場合は --abort オプションをつけて実行します。
+
+<pre>
+$ git rebase --abort
+</pre>
+</p>
+
+<p>他の git rebase のオプションについては、「6章」 を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-4-4" />
+<h3>3.4.4　さまざまなブランチ</h3>
+
+
+<p>git ではブランチの作成が容易なのはもちろん、ブランチを作ると必然的に発生するマージ処理も高速、
+かつ強力な機能です。
+したがって、今までの Subversionなどのツールでは、製品のバージョン区切りなど、
+大きな分岐の場合にブランチが作られるのが主流でしたが、git では「3.4節」で出てきたトピックブランチのように、
+１つの変更のテーマごとに頻繁にブランチを作ることも簡単になっています。
+</p>
+
+<p>ここでは、git を使った開発の運用でよく見られる、ブランチの使い方を紹介します。
+</p>
+
+
+
+
+<h4>トピックブランチ</h4>
+
+<p>トピックブランチは「3.4節」でも紹介したように、バグ修正やある機能の追加など、
+１つの変更のテーマごとに作成するブランチのことです。
+</p>
+
+<p>これは masterなどのメインになるブランチに、中途半端な修正が入らないようにすることが目的であり、
+また、機能追加のブランチ中にバグの修正を混ぜてしまうと、そのブランチをマージしない限り、
+master や他のブランチに修正が反映されないという状況を避けるためにあります。
+</p>
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image039.png" />
+<p>図3.35　トピックブランチの利点</p>
+</div>
+
+
+<p>トピックブランチには、そのテーマに関係のない変更は一切入らないようにします。
+そうすることで、コミットより少し大きな単位として、テーマ毎に完結した変更の塊として扱うことができ、
+以降で説明する統合ブランチや、リリースブランチの作業が分かりやすくなります。
+</p>
+
+
+
+
+<h4>統合ブランチ</h4>
+
+<p>統合ブランチは名前のとおり、派生したブランチでの変更の統合先となります。
+</p>
+
+<p>master ブランチは一番分かりやすい統合ブランチで、先のトピックブランチを使った開発を行い、
+常に完結した変更をマージすることで、安定した状態を維持させます。
+</p>
+
+<p>統合ブランチは複数作られることもあり、プロダクトの安定版のメンテナンス用の系列と、
+次期開発用の系列を用意することがあります。
+</p>
+
+<p>プロダクトのバージョン 1.0.0をリリースした後に、バグ修正のみのメンテナンス用の系列(1.0系列)と、
+次期バージョンのために機能追加も行うメインの系列(1.X系列)を扱う場合を考えてみましょう。
+</p>
+
+</p>メンテナンス用の系列は 1.0.0のリリース後に見つかったバグの修正だけを含むブランチで管理し、
+1.0.1、1.0.2、...のように、プロダクトの安定版のリリース用に使います。
+</p>
+
+<p>次期バージョンの系列は、次の 1.1.0 などのメジャーバージョンアップのために、
+新しい機能の追加も含むブランチとなります。まずは、master 最新のコミットから、
+メンテナンス用のブランチ(maintenance)を作成します。
+開発用のブランチは master をそのまま使います。
+master、および maintenance が、それぞれ開発用、メンテナンス用の統合ブランチとなります。
+</p>
+
+
+<div class="fig">
+<img width="386" height="160" src="chap03-4.files/image041.jpg" />
+<p>図3.36　メンテナンス用のブランチを作成</p>
+</div>
+
+
+<p>1.0.0 のリリース後にバグが報告されたら、maintenance ブランチから修正用のトピックブランチを作成します。
+</p>
+
+<p>トピックブランチ上でバグを修正し、十分に動作確認できたら、maintenance、および master へマージします。
+もし、修正が複雑で他の部分への影響が心配な場合は、一旦 master のみにマージしておきます。
+日常的に開発者は master ブランチを使っているので、何か影響があった場合に発見されやすいからです。
+master へマージした後に、再修正が必要だった場合は、トピックブランチに再修正を行い、再度 master へマージします。
+もう、これで大丈夫という状態になったら、トピックブランチを maintenance ブランチへマージします。
+</p>
+
+
+<div class="fig">
+<img width="566" height="425" src="chap03-4.files/image043.png" />
+<p>図3.37　トピックブランチを使ってバグ修正</p>
+</div>
+
+
+<p>maintenance は、プロダクトの安定版のメンテナンスのためのブランチなので、
+元のリリース(1.0.0)に対して、きちんとバグが修正された状態を維持していかないといけません。
+</p>
+
+<p>一方、次期バージョン用に機能を追加する場合は、master ブランチからトピックブランチを作成して、変更を行います。
+トピックブランチ上で変更が完成したら、master へマージします。
+もし、マージ以降にバグが見つかったら、maintenanceのときと同様に、再度マージします。
+</p>
+
+<p>機能追加のトピックブランチは、master のみにマージして、maintenance へはマージしません。
+</p>
+
+<div class="fig">
+<img width="566" height="228" src="chap03-4.files/image045.jpg" />
+<p>図3.38　トピックブランチを使って機能追加</p>
+</div>
+
+
+<p>開発用のブランチなので、機能追加の場合は master へ直接コミットすることもありますが、
+master は他の開発者も参照するため、できるだけトピックブランチで開発、マージするようにして、
+変更が完結した状態を維持するのが望ましいでしょう。
+</p>
+
+<p>トピックブランチを使っていれば、master を参照している開発者には、新機能が突然、
+完結した状態で追加されたように見えます。
+</p>
+
+
+
+
+<h4>リリースブランチ</h4>
+
+<p>統合ブランチを使って、プロダクトの開発版と安定版を管理する方法を紹介しました。
+複数のバージョンがリリースされるようになると、それぞれのメンテナンス用の統合ブランチが作られます。
+master は常に最新の開発版を管理するようにします。
+</p>
+
+<div class="fig">
+<img width="508" height="300" src="chap03-4.files/image046.png" />
+<p>図3.39　統合ブランチによる複数のリリースバージョンの管理</p>
+</div>
+
+
+<p>この場合は、あるバージョンに対してリリースが１種類でよいのですが、
+ひとつのバージョンに複数のリリースを用意する場合があります。
+</p>
+
+<p>たとえば、プロダクトの同じ 1.0.0 を、Windows版、UNIX版のように複数プラットフォーム用にリリースしたり、
+Ａ社向けカスタマイズ版、Ｂ社向けカスタマイズ版のように、納品先ごとにリリースするような場合です。
+</p>
+
+<p>このように複数のリリースを用意するとき、それぞれのリリース用にリリースブランチを作ります。
+リリースブランチは、リリースするバージョンのベースの機能に、リリース先に個別の機能を追加した状態となります。
+</p>
+
+
+<div class="fig">
+<img width="566" height="282" src="chap03-4.files/image048.jpg" />
+<p>図3.40　リリースブランチの例</p>
+</div>
+
+
+<p>リリースブランチは、リリース先ごとの個別の変更を追加していきますが、
+リリース先の数が増えたり、ベースのリリースバージョンが増えてくると管理が複雑になってしまいます。
+リリースブランチの運用の際には、できるだけリリース先ごとの個別の変更を少なく抑えるのがコツです。
+</p>
+
+<p>あるリリース先用の個別の機能を追加する場合、その機能を ON/OFF できるように作っておき、
+デフォルトでは OFF の状態となるようにし、ベースの統合ブランチに含めてしまいます。
+そうすれば、リリースブランチでは、その機能を ON にするだけのコミットを追加すればよくなります。
+これで、ベースの統合ブランチと、リリースブランチのの差分を小さくしておくことができます。
+</p>
+
+<p>また、ベースの統合ブランチの機能を ON/OFF できるようにしておくことで、
+別のリリース先でも同様の機能が必要になった場合に、機能を ON にするだで対応できるようになります。
+</p>
+
+<div class="fig">
+<img width="566" height="347" src="chap03-4.files/image050.jpg" />
+<p>図3.41　リリースブランチで機能の ON/OFFを切換</p>
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>7.　GitHub</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c7" />
+<h1>7.　GitHub</h1>
+
+
+<p>本章では、githubについて紹介します。
+githubに公開リポジトリを作成し、そのリポジトリから作業リポジトリの作成、コードの変更、
+変更内容を反映することまで説明します。
+</p>
+
+
+<a name="c7-1" />
+<h2>7.1　GitHubにアカウントを作成する</h2>
+
+
+<h4>GitHubとは</h4>
+
+<p>githubとは、git のプロジェクトホスティングサービス[1]です。
+</p>
+
+<p>作ったコードを githubにアップロードしておけば、他の人が楽にソースを参照することができ、
+アップデートすることもできます。
+言い換えれば、公開用のリポジトリ「3.3節」をウェブ上に作成できるサービスです。
+</p>
+
+<p>具体的には、以下のことができます。
+</p>
+
+<ul>
+<li>作者はリポジトリを作成して公開できる</li>
+<li>他の人はリポジトリをフォークして自由に開発・公開できる</li>
+<li>作ったパッチの適用を作者に依頼できる</li>
+</ul>
+
+<p>Linuxカーネルやgit自身、jQueryCakePHP、Rails、RSpec、PostgreSQL、Apache 等、
+様々なオープンソースの開発の場所にもなっています。
+</p>
+
+<p>では、github（http://github.com/）に行ってみましょう。
+<pre>
+<a href="https://github.com/">https://github.com/</a>
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="563" height="398" src="chap07.files/image002.jpg" />
+<p>図7.1　GitHubサイトのトップページ</p>
+</div>
+
+
+
+
+<h4>アカウントを作成する</h4>
+
+<p>リポジトリを作成するためにはアカウントを作成する必要があります。
+アカウントの作成手順は以下の通りです。
+</p>
+
+
+<p>(1)　［プランと価格の一覧、新規登録］をクリックします。
+
+<div class="fig">
+<img width="563" height="398" src="chap07.files/image004.jpg" />
+<p>図7.2　プラン・価格</p>
+</div>
+</p>
+
+
+<p>(2)　図7.22のように、有料プランの場合は、非公開リポジトリも作成できます。
+</p>
+
+<p>プランはアカウント作成後にも変更できますので、今回は［無料アカウントの作成］をクリックします。
+</p>
+
+<p>無料アカウントの場合は、0.30GBまで使えます。
+
+<div class="fig">
+<img width="563" height="398" src="chap07.files/image006.jpg" />
+<p>図7.3　GitHubに登録</p>
+</div>
+</p>
+
+
+<p>(3)　ユーザ名、メールアドレス、パスワードを入力してから［アカウントの作成］をクリックします。
+</p>
+
+<p>以上でアカウント作成は完了です。アカウントの作成が終わったら、以下の画面が表示されます。
+
+<div class="fig">
+<img width="563" height="398" src="chap07.files/image008.jpg" />
+<p>図7.4　アカウントの作成完了</p>
+</div>
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c7-2" />
+<h2>7.2　GitHubにリポジトリを作成する</h2>
+
+
+<h4>SSH公開鍵の追加</h4>
+
+<p>アカウント作成が完了できたら、SSH 公開鍵を登録しましょう。
+SSH 公開鍵を登録しなければ、作成したコードなどをgithubに反映（プッシュ[2]）することができません。
+</p>
+
+<p>githubにSSH 公開鍵を登録する手順は以下の通りです。
+</p>
+
+<p>(1)　ローカルでSSH公開鍵を作成します。
+</p>
+
+<p>a. 既存のSSH公開鍵の確認とバックアップ
+</p>
+
+<pre>
+$ cd ~/.ssh
+</pre>
+
+<p>上記のコマンドで“No such file or directory” というメッセージが表示されたら、
+バックアップの段階は不要ですので、［b. 公開鍵の作成］を行います。
+
+<pre>
+$ ls
+config  id_rsa  id_rsa.pub  known_hosts
+</pre>
+</p>
+
+<p>この公開鍵をそのまま使う場合は、以下のバックアップと［b. 公開鍵の作成］手順は飛ばします。
+
+<pre>
+$ mkdir key_backup
+$ cp id_rsa* key_backup  # key_backupにバックアップします
+$ rm id_rsa*             # バックアップ後、不要なファイルを削除します
+</pre>
+</p>
+
+
+<p>b. 公開鍵の作成
+</p>
+
+<p>以下のコマンドで公開鍵を作成します。
+コマンドを実行したら、公開鍵を保存する場所と設定するパスワードを聞かれます。
+
+<pre>
+$ ssh-keygen -t rsa -C "example@example.com"
+Generating public/private rsa key pair.
+Enter file in which to save the key (/c/Users/example/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /c/Users/ example/.ssh/id_rsa.
+Your public key has been saved in /c/Users/ example/.ssh/id_rsa.pub.
+The key fingerprint is:
+e8:ae:60:8f:38:c2:98:1d:6d:84:60:8c:9e:dd:47:81
+example@example.com
+</pre>
+</p>
+
+<p>以下のように鍵のセットが作成されます。
+
+<pre>
+$ cd ~/.ssh
+$ ls
+config  id_rsa  id_rsa.pub  known_hosts
+</pre>
+</p>
+
+<p>(2)　公開鍵であるid_rsa.pubをエディターで開いてから内容を全てコピーします。
+</p>
+
+<p>(3)　githubから［アカウント設定］→［SSH公開鍵］の順にクリックします。
+</p>
+
+<div class="fig">
+<img width="563" height="388" src="chap07.files/image010.jpg" />
+<p>図7.5　SSH公開鍵の追加</p>
+</div>
+
+
+<p>(4)　別の公開鍵の追加］をクリックします。
+</p>
+
+<div class="fig">
+<img width="563" height="385" src="chap07.files/image012.jpg" />
+<p>図7.6　SSH公開鍵の入力</p>
+</div>
+
+
+<p>(5)　キー］に(2)でコピーしたSSH公開鍵を貼り付けてから［キーの追加］をクリックします。
+</p>
+
+<p>以上でSSH公開鍵の登録手順は完了です。
+SSH公開鍵が正常に登録されたか確認するため、以下のようにsshでgithubに接続します。
+
+<pre>
+$ ssh git@github.com
+Hi woobin! You've successfully authenticated, but GitHub does not
+provide shell access. Connection to github.com closed.
+</pre>
+</p>
+
+<p>正しく登録されたら、上記のようなメッセージが表示されます。
+</p>
+
+
+
+<h4>新しいリポジトリを作成してソースコードを登録する</h4>
+
+<p>いよいよ、自分のソースコードをアップする公開リポジトリを作成しましょう。
+githubに公開リポジトリの作成手順は以下の通りです。
+</p>
+
+<p>(1)　ダッシュボードから［新しいリポジトリ］をクリックします。
+</p>
+
+<div class="fig">
+<img width="563" height="388" src="chap07.files/image014.jpg" />
+<p>図7.7　ダッシュボード</p>
+</div>
+
+
+<p>(2)　プロジェクト名を入力して［リポジトリを作る］をクリックします。
+</p>
+
+<div class="fig">
+<img width="563" height="398" src="chap07.files/image016.jpg" />
+<p>図7.8　新しいリポジトリの作成</p>
+</div>
+
+
+<div class="fig">
+<img width="563" height="388" src="chap07.files/image018.jpg" />
+<p>図7.9　リポジトリ作成後の画面</p>
+</div>
+
+
+<p>上記の画面が表示されたら、リポジトリの作成は完了です。
+引き続きドキュメントに従ってリポジトリへデータをアップロードしましょう。
+</p>
+
+<p>［全体設定］はgitのインストールと初期設定を行う段階です。
+まだgitをインストールしていない場合は、インストールと初期設定をします。
+その方法は「2.1節」をご参照ください。
+</p>
+
+<p>［次の手順］READファイルを作成してgithubにファイルを反映（プッシュ）する段階です。
+
+<pre>
+$ mkdir learn_github
+$ cd learn_github
+$ git init                          # ローカルで作業リポジトリ作成
+$ touch README
+$ git add README
+$ git commit -m 'first commit'      # 空のREADMEファイルをコミット
+$ git remote add origin git@github.com:woobin/learn_github.git    
+
+# 公開リポジトリのURLを登録
+$ git push origin master            # 公開リポジトリに変更内容をプッシュ
+</pre>
+</p>
+
+<p>githubへのプッシュが成功したら、以下のようなメッセージが表示されます。
+
+<pre>
+Counting objects: 3, done.
+Writing objects: 100% (3/3), 207 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@github.com:woobin/learn_github.git
+ * [new branch]      master -> master
+</pre>
+</p>
+
+<p>［すでにGitリポジトリがありますか?］は、すでに持っているgitリポジトリをgithubにプッシュするコマンドです。
+</p>
+
+<p>どちらにしてもプッシュに成功しましたら、githubサイトに行ってみましょう。
+以下のようにプッシュした内容が確認できます。
+</p>
+
+<div class="fig">
+<img width="563" height="387" src="chap07.files/image020.jpg" />
+<p>図7.10　プッシュしたファイル</p>
+</div>
+
+
+
+
+<h4>ファイルを変更してコミット、プッシュする。</h4>
+
+<p>では少し応用してREADMEファイルを変更してみましょう。
+viなどのエディターでREADMEファイルを開いて内容を追加します。
+
+<pre>
+$ vi README
+</pre>
+</p>
+
+<p>インデックスに登録、作業リポジトリにコミットをします。
+
+<pre>
+$ git commit -a -m "second commit"
+Created commit 8a3519f: second commit
+1 files changed, 5 insertions(+), 0 deletions(-)
+</pre>
+</p>
+
+<p>githubのリポジトリへプッシュします。
+
+<pre>
+$ git push origin master
+Counting objects: 5, done.
+Writing objects: 100% (3/3), 245 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@github.com:woobin/learn_github.git
+ A248bc6..28704dd     master -> master
+</pre>
+</p>
+
+<p>以下のようにgithubサイトから新しいコミット情報が確認できます。
+</p>
+
+<div class="fig">
+<img width="563" height="387" src="chap07.files/image022.jpg" />
+<p>図7.11　変更を反映した画面</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c7-3" />
+<h2>7.3　GitHubからリポジトリをコピーする</h2>
+
+<p>ここではgithub上のリポジトリをコピーして新しい作業リポジトリを作成し、変更、コミット、プッシュをします。
+</p>
+
+
+<h4>リポジトリをコピーする</h4>
+
+<p>githubに登録されているリポジトリはgit clone &lt;URL&gt;コマンドからコピーすることができます。
+</p>
+
+<blockquote>※URLはgithubサイトでリポジトリのソースから確認できます。
+URLは読み込み+書き込みURLと読み込みのみのURLがあります。
+読み込み+書き込みURLの場合は、パスワード認証もしくはSSH認証が必要になります。
+</blockquote>
+
+
+<div class="fig">
+<img width="563" height="387" src="chap07.files/image022.jpg" />
+<p>図7.12　リポジトリのソース画面</p>
+</div>
+
+
+<p>以下は先ほど登録したリポジトリをコピーする例です。
+
+<pre>
+$ mkdir copy_repository
+$ cd copy_repository
+$ git clone git@github.com:woobin/learn_github.git
+
+# 指定したURLからリポジトリをコピーする
+# 後でプッシュするために［書き込み+読み込みURL］を使います
+Cloning into learn_github...
+remote: Counting objects: 9, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 9 (delta 0), reused 0 (delta 0)
+Unpacking objects: 100% (9/9), done.
+</pre>
+</p>
+
+<p>以下のようにリポジトリがコピーされたことが確認できます。
+
+<pre>
+$ ls
+learn_github
+</pre>
+</p>
+
+<p>実際にはコピーしたリポジトリで開発を進めていくかたちになります。
+ここでは簡単に、コピーしたファイルを変更し、プッシュしてみましょう。
+</p>
+
+<p>まず、エディターでファイルを開き、内容を変更してコミットします。
+
+<pre>
+$ cd learn_github
+$ ls
+README
+$ git pull origin master          # githubから変更履歴があれば更新
+$ vi README                       # エディターでファイルを開いて内容を変更
+$ git commit -a -m "mac commit"   # 変更内容をコミット
+[master 9e13eda] mac commit
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+</pre>
+</p>
+
+<p>コミットした内容をgithubにプッシュします。プッシュする前に名前とメールを設定します。
+
+<pre>
+$ git config --global user.name seconduser
+$ git config --global user.email example@example.com
+$ git config --list                     # 名前とメール設定後、設定内容を確認
+user.name=seconduser
+user.email=example@example.com
+……
+
+$ git push origin master                # githubにプッシュ
+Counting objects: 5, done.
+Writing objects: 100% (3/3), 267 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git clone git@github.com:woobin/learn_github.git
+ 67a1bbc..9e13eda  master -> master
+</pre>
+</p>
+
+<p>以下のようにウェブからプッシュした内容が確認できます。
+</p>
+
+
+<div class="fig">
+<img width="563" height="387" src="chap07.files/image024.jpg" />
+<p>図7.13　プッシュ後の画面</p>
+</div>
+
+
+<p>以上でgithubから新しい作業リポジトリを作成して、変更内容をgithubに反映までの手順は完了です。
+</p>
+
+
+<p>　</p>
+
+<hr/>
+
+<blockquote>[1]　アプリケーションやドキュメントなどを製作するプロジェクトをホストしてくれるサービスのこと。
+</blockquote>
+
+<blockquote>[2]　プッシュ（push）は作業リポジトリの変更履歴を公開リポジトリに反映するコマンドです。
+詳しくは「3.3節」ご参照ください。
+</blockquote>
+
+
+</body>
+
+</html>

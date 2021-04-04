@@ -1,0 +1,1442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>3.2　ちょっと高度な使い方</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c3-2" />
+<h2>3.2　ちょっと高度な使い方</h2>
+
+
+<a name="c3-2-1" />
+<h3>3.2.1　変更を取り消す</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、やっぱこの方法はやめようかなぁ。元のファイルに戻してと。
+</div>
+
+<div>
+<b>ナス　　</b>
+どしたん？なんかハマってんの？
+</div>
+
+<div>
+<b>ぱいん　</b>
+変更しかけてたんですけど、やっぱりやめようと思って、元のファイルに戻したんですよぉ。
+<pre>
+$ cp -p MiniTable.java.orig MiniTable.java
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+おっと、せっかくバージョン管理ツールつこてんやから、そんなことせんでもええねんで。<br/>
+作業ツリーのファイルを変更前のファイルに戻すんやったら、git checkoutってのが使えるで。
+<pre>
+$ git checkout src/minitable/MiniTable.java
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、ちゃんと元に戻ってますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+実は、git statusで、作業ツリーの変更されたファイルに対する手順ってことで、ちゃんと教えてくれてるんやで。
+<pre>
+$ git status
+# On branch master
+# Changed but not updated:
+#   (use "git add/rm &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)  # 作業ツリーの変更を戻す場合の手順
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ほんとだ。気づかなかったですねぇ。<br/>
+作業ツリーの変更をコミットするなら git add、変更を取り消すなら
+git checkout &lt;file&gt; って教えてくれてるんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。<br/>
+ちなみに、git checkout &lt;file&gt; は作業ツリー上の変更取り消しで、
+インデックスに予約した変更の取り消しは前(3.1節)にやった git reset &lt;file&gt; やな。<br/>
+あと、コミットした変更を取り消す git revertってのもあるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+コミットも取り消せるんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+コミットの取り消し言うより、コミットの変更を打ち消す変更を上書きやな。
+コミット自体の取り消しもあるけど、それはまた後でな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+変更を打ち消す変更ってややこしいなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやなぁ。ちょっと分かりにくいかもなぁ。<br/>
+何かコードの追加のコミットやったら、その追加した部分のコードを削除する変更を新しくコミットするんやな。
+git log で打ち消したいコミットのIDを調べて、git revertで指定するんや。
+<pre>
+$ git log
+  :
+commit 2c578ec5d1d912ddc42c6c6762a076649e6f5139  # このコミットを取り消し
+Author: pine &lt;pine@example.com&gt;
+Date:   Thu Aug 20 20:00:04 2009 +0900
+
+    deleteメソッドを追加する
+
+$ git revert 2c57　　# 取り消すコミットのIDを指定(IDが特定できるだけの桁があればよい)
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ん？エディタが起動しましたね。git commitのときみたいですね。
+<pre>
+Revert "deleteメソッドを追加する"
+
+This reverts commit 2c578ec5d1d912ddc42c6c6762a076649e6f5139.
+
+# Please enter the commit message for your changes. Lines starting
+:
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやで。IDが2c57...の変更を打ち消すコミットを追加しようとしてるんや。<br/>
+ここには、"仕様が決まっていないので、ひとまず削除" みたいな打ち消した理由を書いとこか。
+エディタを保存して終了したら、打消しの変更がコミットされるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git logで見たら、コミットが増えてますね♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="420" src="chap03-2.files/image002.png" />
+</div>
+
+
+<p>ここでは、変更内容を取り消す方法について説明します。
+変更の取消しにはいくつかの方法があります。
+</p>
+
+<ul>
+<li>インデックスへ登録した変更を取消す</li>
+<li>作業ツリーでの変更を取消す。</li>
+<li>コミット済みの変更を取消す。</li>
+</ul>
+
+<p>このうち、インデックスへの登録の取り消しは「3.1.5節」で説明した git reset &lt;file&gt;で行います。
+</p>
+
+
+<p>他の２つについて、まず、作業ツリーの変更の取り消しについて説明します。
+</p>
+
+<p>作業ツリーの変更の取り消しとは、現在エディタなどで編集中の変更を破棄して、最新のコミットなどの状態に戻すことをいいます。
+ちょうど、エディタなどの編集内容を保存せずに、前の保存済みの状態を開きなおすのに似ています。
+</p>
+
+
+<h4>git checkout</h4>
+
+<p>作業ツリーの変更を取消すには git checkout コマンドを使います。
+</p>
+
+<pre>
+git checkout &lt;file&gt;
+</pre>
+
+<p>引数に指定されたファイルを、最新のコミット時点の内容で書き換えます。
+ディレクトリを指定した場合は、指定したディレクトリ以下のすべてのファイルが書き換えられます。
+このとき、指定したファイルがインデックスに登録されていると、インデックスに登録した時点の内容で書き換えられます。
+
+<pre>
+$ cat sample.txt
+checkout 1
+
+(edit)
+$ git diff sample.txt    # sample.txtの内容を変更
+  :
+- checkout 1
++ checkout 2
+
+$ git checkout sample.txt
+$ cat sample.txt         # 変更内容が取り消される
+checkout 1
+
+(edit)
+$ cat sample.txt
+checkout 2
+
+$ git add -u sample.txt  # さっきと同じ変更をしてインデックスに登録
+
+(edit)
+$ git diff sample.txt    # インデックスと作業ツリーの差分
+  :
+- checkout 2
++ checkout 3
+
+$ git diff --cached sample.txt
+  :                      # 最新コミットとインデックスの差分
+- checkout 1
++ checkout 2
+
+$ git checkout sample.txt
+$ cat sample.txt         # インデックスの内容で書き換え
+checkout 2
+</pre>
+</p>
+
+<p>明示的に最新コミットの時点に戻したい場合は、次のように HEADを指定します。
+</p>
+
+<pre>
+git checkout HEAD &lt;file&gt;
+</pre>
+
+<p>HEADを指定すると、インデックスに登録した内容も破棄され、作業ツリーのファイル、インデックス、
+最新コミットがすべて同じ内容となります。
+</p>
+
+<pre>
+(edit)
+$ git status             # インデックス、作業ツリー、最新コミットにそれぞれ変更された状態
+   :
+# Changes to be committed:
+#       modified:   sample.txt
+#  :
+# Changed but not updated:
+#       modified:   sample.txt
+
+$ git checkout HEAD sample.txt
+$ cat sample.txt         # 最新コミットの内容で書き換え
+checkout.1
+
+$ git status             # インデックスの内容も取り消し
+   :
+nothing to commit (working directory clean)
+</pre>
+
+<p>git checkout のその他のオプションについては、「6章」を参照して下さい。
+</p>
+
+
+<h4>git revert</h4>
+
+<p>以前にコミット済みの変更を取り消すには、git revert コマンドを使います。
+</p>
+
+<pre>
+git revert &lt;commit&gt;
+</pre>
+
+<p>コミットのIDを指定すると、そのコミットの変更を打ち消すコミット作成します。
+</p>
+
+<pre>
+$ git show d17e02d8    # 取り消したいコミットを確認
+commit d17e02d88b68c3f9d219eb461f9a8d019c9c7ed9
+Author: pine &lt;pine@example.com&gt;
+
+  revertのテスト
+  :
+
+diff --git a/sample.txt b/sample.txt
+index 8528a67..6f8668b 100644
+--- a/sample.txt
++++ b/sample.txt
+@@ -1,4 +1,4 @@
+   :
+-revert 1
++revert 2
+
+$ git revert d17e02d8
+(エディタが起動され、コミットのメッセージを編集)
+
+  Revert "revertのテスト"
+
+This reverts commit d17e02d88b68c3f9d219eb461f9a8d019c9c7ed9.
+   :
+(エディタを終了するとコミットされる)
+
+Finished one revert.
+
+[master 949ee25] Revert "revertのテスト"
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+$ git log
+commit 949ee258113e5291eb09b79892a71a995933bbbd  # 取り消しのコミット
+Author: pine &lt;pine@example.com&gt;
+
+    Revert "revertのテスト"
+
+    This reverts commit d17e02d88b68c3f9d219eb461f9a8d019c9c7ed9.
+    :
+
+commit d17e02d88b68c3f9d219eb461f9a8d019c9c7ed9  # 取り消されたコミット
+Author: pine &lt;pine@example.com&gt;
+
+    revertのテスト
+
+$ git show 949ee258    # 取り消し対象のコミットと逆の変更になる
+commit 949ee258113e5291eb09b79892a71a995933bbbd
+Author: pine &lt;pine@example.com&gt;
+
+    Revert "revertのテスト"
+
+    This reverts commit d17e02d88b68c3f9d219eb461f9a8d019c9c7ed9.
+
+diff --git a/README b/README
+index 6f8668b..8528a67 100644
+--- a/README
++++ b/README
+@@ -1,4 +1,4 @@
+   :
+-revert 2
++revert 1
+</pre>
+
+<p>git revert はコミットを取り消すのではなく、コミットの変更内容を取り消す新しいコミットを追加します。
+</p>
+
+<p>したがって、たくさんの変更をひとつのコミットにまとめてしまうと、
+git revert を使ったときに一度に変更が取り消されてしまいます。
+git revertを上手に使うためには、変更をひとつひとつ完結した状態でコミットするようにしましょう。
+</p>
+
+<p>なお、コミットそのものを削除する方法は「3.2.3節」で紹介します。
+git revertのその他のオプションについては、「6章」を参照して下さい。
+</p>
+
+<p>ここまでで紹介した変更の取り消しの方法をまとめると、以下のようになります。
+</p>
+
+<ul>
+<li>git reset &lt;file&gt;　　　　　インデックスの変更取り消し</li>
+<li>git revert &lt;commit&gt;　　コミットの変更取り消し</li>
+<li>git chekcout &lt;file&gt;　　　作業ツリーの変更取り消し</li>
+</ul>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-2-2" />
+<h3>3.2.2　履歴を検索する</h3>
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+(これ、いつ追加したかなぁ。。)<br/>
+ナス先生！前に行った変更、いつコミットしたか調べる方法ってありますか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ん？あるで。(珍しくぱいんちゃんから質問やな)
+</div>
+
+<div>
+<b>ぱいん　</b>
+さすが、gitちゃん！かゆいところに手が届いてるんですね。
+何かやりたいときに、gitちゃんに方法があるような気がして、まず聞いてみることにしました♪
+</div>
+
+<div>
+<b>ナス　　</b>
+ああ、そうやなぁ。gitには、やりたい思うことは、何かしら手段が用意されてるなぁ。<br/>
+まあ、ソース管理したい人(Linus Tovals)が、自分の欲しいツール作ったわけやから、気の利いたもんになってるんやろなぁ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+欲しい人が自分で作っちゃうってすごいですねぇ。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、履歴の調べ方やな。<br/>
+いくつか方法あるけど、git logはいろんな使い方できるで。
+たとえば、-p つけたらパッチ形式ゆうて、ログに差分情報追加されるんや。
+<pre>
+$ git log -p
+commit 3f0383b...a24df9b1
+Author: pine &lt;pine@example.com&gt;
+Date:   Thu Aug 20 20:02:19 2009 +0900
+
+    keyの存在確認メソッド追加
+
+diff --git a/src/minitable/MiniTable.java b/src/minitable/MiniTable.java
+index 1df7dc4..8b946fd 100644
+--- a/src/minitable/MiniTable.java
++++ b/src/minitable/MiniTable.java
+@@ -13,5 +13,9 @@ public class MiniTable {
+
+        public void delete(String key) {
+        }
++
++       public boolean keyExist(String key) {
++               return false;
++       }
+ }
+
+commit 2c578ec5...9e6f5139
+Author: pine &lt;pine@example.com&gt;
+Date:   Thu Aug 20 20:00:04 2009 +0900
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+へぇ、差分見ながらだと、追加・変更した場所調べられますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+他にもファイル指定して、行毎に追加されたコミットを一覧できるコマンドもあるで。
+<pre>
+$ git blame 3f0383b src/minitable/MiniTable.java
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  1)
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  2) public class MiniTable {
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  3)
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  4)      public MiniTable() {
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  5)      }
+^6977ff9 (pine 2009-08-20 19:55:44 +0900  6)
+2c578ec5 (pine 2009-08-20 20:00:04 +0900 14)      public void delete(String key) {
+2c578ec5 (pine 2009-08-20 20:00:04 +0900 15)      }
+3f0383b1 (pine 2009-08-20 20:02:19 +0900 16)
+3f0383b1 (pine 2009-08-20 20:02:19 +0900 17)      public boolean keyExist(String key) {
+3f0383b1 (pine 2009-08-20 20:02:19 +0900 18)              return false;
+3f0383b1 (pine 2009-08-20 20:02:19 +0900 19)      }
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+これはなんかすごいですね！
+ファイルが決まってる場合は、コミットが一覧できますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやな。<br/>
+とくに git log はいろんな形の履歴の表示方法が用意されてるよって、覚えとくと便利やで。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="421" src="chap03-2.files/image004.png" />
+</div>
+
+
+<h4>git log</h4>
+
+<p>「3.1.7節」で紹介した git log コマンドは、いろいろな形式で今までのコミットの履歴を参照できましたが、
+表示するだけでなく、特定の履歴の検索にも使うことができます。
+</p>
+
+<p>git log にコミットの範囲を指定すると、任意のコミット間の履歴のみを表示することができます。
+<pre>
+git log &lt;commit&gt;..&lt;commit&gt;
+</pre>
+</p>
+
+<p>ここで、&lt;commit&gt; にはコミットIDや、後述のタグ(3.2.4節)や、ブランチ(3.4節) を指定することができます。
+<pre>
+git log 464b5ffa..      # "464b5ffa" 以降のコミット
+git log v1.0..          # タグ "v1.0" 以降のコミット
+git log master..test    # master ブランチにはなくて、test ブランチに含まれるコミット
+git log HEAD~3..        # 最新コミットの３世代前より後のコミット
+</pre>
+</p>
+
+<p>また、ファイルやディレクトリを指定し、指定されたファイルに対する変更が行われたコミットのみを検索することができます。
+<pre>
+git log &lt;file or directory&gt;
+git log build.xml      # build.xml に変更があるコミットを表示
+git log src/minitable  # src/minitable 以下のファイルに変更があるコミットを表示
+</pre>
+</p>
+
+<p>さらに、コミットの範囲指定とファイル指定を組み合わせて指定することもできます。
+<pre>
+git log v1.0..v1.2 build.xml src/
+</pre>
+</p>
+
+<p>他にも、コミット日時やコミットした人で範囲を絞ることができます。
+<pre>
+git log --since="2009-10-1"  # 2009/10/1 以降のコミットを表示
+git log --until="2009-9-30"  # 2009/9/30 以前のコミットを表示
+
+git log --author="pine"      # "pine" によるコミットを表示
+git log --committer="nus"    # 変更した人とコミットした人が異なる場合 "nus" によるコミットを表示
+</pre>
+</p>
+
+<p>git log のその他のコマンドについては、「6章」を参照して下さい。
+</p>
+
+
+<h4>git blame</h4>
+
+<p>ファイルが分かっていて、そのファイルの特定の行がいつ追加されかを検索したい場合は git blame コマンドが便利です。
+</p>
+
+<p>git blame コマンドは指定したファイルの行毎に、どのコミットで追加・変更されたかを一覧表示します。
+<pre>
+git blame &lt;file&gt;
+</pre>
+</p>
+
+<p>ファイルを指定して実行すると、行毎にコミットID、コミットした人・時間、行番号、ファイルの内容を表示します。
+<pre>
+$ git blame build.xml
+b387f949 (pine       2009-07-23 02:34:59 +0000   1) &lt;project name="minitable" default="jar"&gt;
+b387f949 (pine       2009-07-23 02:34:59 +0000   2) &lt;property name="target.name" value="minitable"/&gt;
+    :
+</pre>
+</p>
+
+<p>デフォルトでは最新のコミットの内容を表示しますが、過去のある時点のファイルに対して表示した場合は、
+ファイルの前にコミットIDやタグなどを指定します。
+<pre>
+$ git blame c54e71b2 build.xml
+</pre>
+</p>
+
+<p>また、表示内容を変更するオプションもあり、たとえばコミットした人に関する情報を省略する場合は -s オプションを指定します。
+<pre>
+$ git blame -s build.xml
+b387f949   1) &lt;project name="minitable" default="jar"&gt;
+b387f949   2) &lt;property name="target.name" value="minitable"/&gt;
+    :
+</pre>
+</p>
+
+<p>その他の git blame のオプションについては、「6章」を参照して下さい。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-2-3" />
+<h3>3.2.3　履歴を変更する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+前に保留してたコミット自体の取り消しの仕方やろか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+わ、今日はどうしたんですか！？
+</div>
+
+<div>
+<b>ナス　　</b>
+なんか気が向いたよって。
+</div>
+
+<div>
+<b>ぱいん　</b>
+気分屋だなぁ。。
+</div>
+
+<div>
+<b>ナス　　</b>
+前は変更の取り消しやったけど、今回は履歴そのものを変更するよって、 注意が必要やで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、確かに履歴をいじってしまうのは怖いかも。
+</div>
+
+<div>
+<b>ナス　　</b>
+まぁ、今は一人で開発してるから、そんなに気をつけることもないけど、
+グループで使い始めたら、勝手に履歴変更して連携できんようになると困るよってな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+<div>　</div>
+
+<div>
+<b>ナス　　</b>
+まずは一番新しいコミットを取り消す場合やな。git reset使うんや。
+<pre>
+$ git reset HEAD^
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あれ、git resetって変更の取り消しにも使いましたよね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやな。変更の取り消しとコミットの取り消しが、同じコマンドでできるよって、ややこしいけどな。<br/>
+git reset いうのは、最新のコミットを変更して、インデックスを最新コミットの状態にするコマンドなんや。
+今まで、HEADって何度か見てるけど、実はこれは最新のコミットを参照するラベルやねん。
+正確には現在のブランチの最新コミットってことやけど、ブランチはもうちょっと後やな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+変更の取り消しのときは HEADでしたけど、今回のコミット取り消しは HEAD^てなってますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやねん。<br/>
+変更取り消しのときは HEADを指定すると、git resetは HEADの参照先はそのままで、インデックスを HEADの状態にしてたんや。
+せやから、インデックスを元に戻してるように見えたんやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ってことは、HEAD^ってなんなのかなぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+HEAD^ いうのは「HEADのひとつ前」という意味なんや。<br/>
+git resetで HEAD^を指定すると、HEADの参照先がひとつ前のコミットに変更される。
+つまり、最新のコミットが取り消されたように見えるわけや。
+
+<div class="fig">
+<img width="368" height="194" src="chap03-2.files/image005.png" />
+</div>
+</div>
+
+<div>
+<b>ぱいん　</b>
+へぇ、実際は同じ動作してるけど、表向きはあたかも違う処理をしてるように見えてたんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことやな。<br/>
+コミットの指定の仕方には、他にも HEAD^^ で２つ前とか、HEAD~3 で３つ前ってのもあるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+HEADを基準に指定できるってことなんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+git resetしたら、HEADとインデックスは変更されるけど、作業ツリーには元のファイルが残ってるよって、
+これを修正して再コミットすれば、コミットのやり直しができるで。<br/>
+ちなみに、作業ツリーのファイルもインデックスと同じにしてしまいたい場合は --hard オプションつければええんや。
+<pre>
+$ git reset --hard HEAD^
+</pre>
+
+それから、コミットメッセージを変更したいだけなら、直前のコミットをやり直すっちゅー方法もあんねん。
+<pre>
+$ git commit --amend
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+ん？エディタが起動しましたよ。
+前のコミットのメッセージが書かれてますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう、直前のコミットを一旦取り消して、再度コミットしようとしてる状態になるんや。
+ここで、コミットメッセージを直して、エディタを保存終了すればOKや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、これは便利かも♪
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="419" src="chap03-2.files/image007.png" />
+</div>
+
+
+<p>「3.2.1節」では変更を取り消す方法をいくつか見ましたが、gitではコミットの履歴そのものを取り消すことも可能です。
+gitは分散リポジトリにより、ユーザーがローカルに自分のリポジトリを持つため、
+履歴を編集することができるようになっています。
+</p>
+
+<p>ただし、公開リポジトリへ反映したコミットを編集してはいけません。
+なぜなら、一度公開されたものはグループのメンバも参照しているため、コミットを編集してしまうと、
+履歴の不一致がおきてしまうからです。
+公開リポジトリは「3.4節」を参照してください。
+</p>
+
+
+<h4>git reset</h4>
+
+<p>コミットを取り消すにはgit resetコマンドを使います。
+git resetは最新のコミットを変更して、インデックスを最新コミットの状態にします。
+<pre>
+git reset HEAD^
+</pre>
+</p>
+
+<p>オプションで指定した「HEAD^」は現在の最新コミット（HEAD）のひとつ前のコミットを指していて、
+上の例ではひとつ前のコミットを最新コミットにする、つまり現在の最新コミットをひとつ取り消すということになります。
+</p>
+
+<div class="fig">
+<img src="chap03-2.files/image008.png" />
+<p>図3.7　最新のコミットを取り消す</p>
+</div>
+
+<p>２つ前、３つ前のコミットは「HEAD^^」「HEAD^^^」のように表せます。
+さらに前のコミットは「HEAD~3」のように指定することができ、一度に複数のコミットを取り消すこともできます。
+</p>
+
+<p>また、「3.1.5節」の変更予約の取り消しでも git reset を使いましたが、
+コミットの参照を指定しないと暗黙で HEAD が指定されたことになり、最新のコミットは変更せず、
+インデックスのみ最新コミットの状態に戻すため、変更予約の取り消し動作となっていました。
+</p>
+
+<p>このように、git では同じコマンドでありながら、別の用途のように使われることがあるので、注意が必要です。
+</p>
+
+
+<h4>git commit --amend</h4>
+
+<p>続いてコミットの修正を行います。まずは直前のコミットのやり直しをしてみましょう。
+<pre>
+git commit --amend
+</pre>
+</p>
+
+<p>コミットしたあとで、追加し忘れていたファイルに気づいたときは、新たにコミットするのではなく、
+コミットのやり直しで前のコミットに追加することができます。
+ただし、これも公開済のコミットに使ってはいけません。
+
+<pre>
+$ git add file1.txt
+$ git commit
+$ git show --summary
+   :
+create mode 100644 file1.txt    # file1.txtを追加
+
+$ git add file2.txt   # file2.txtを追加し忘れていたので修正
+$ git commit --amend
+$ git show --summary
+create mode 100644 file1.txt
+create mode 100644 file2.txt    # やり直したコミットにfile2.txtが追加される
+</pre>
+</p>
+
+
+<h4>git rebase</h4>
+
+<p>さらに、直前のコミットだけでなく、過去に遡ってコミットを修正することもできます。
+過去のコミットを修正するにはgit rebase -iを使います。
+
+<pre>
+git rebase -i &lt;修正したいコミット&gt;
+</pre>
+
+<p>たとえば、２つ前のコミットに誤りがあった場合は、以下のように３つ前のコミットを指定して git rebase を実行すると、 
+エディタが開きます。
+
+<pre>
+$ git rebase -i HEAD~3
+(エディタ起動)
+
+pick 29c716a ハンドラの追加
+pick 880ef4c deleteコマンドの追加
+pick 6adee3d getコマンドの修正
+
+# Rebase 4a52bde..6adee3d onto 4a52bde
+#
+# Commands:
+#  p, pick = use commit
+#  r, reword = use commit, but edit the commit message
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#  f, fixup = like "squash", but discard this commit's log message
+#  x &lt;cmd&gt;, exec &lt;cmd&gt; = Run a shell command &lt;cmd&gt;, and stop if it fails
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+# However, if you remove everything, the rebase will be aborted.
+#
+</pre>
+</p>
+
+<p>一覧から修正したいコミットを選び、「pick」の部分を「edit」に変更します。
+
+<pre>
+edit 29c716a ハンドラの追加
+   ：
+</pre>
+</p>
+
+<p>git rebase -i は指定された過去のコミットから順番にコミットしなおすのですが、
+そのときコミットをどのように扱うかを指定します。
+editの場合は再コミットの前に一旦ストップするので、そのときに修正を行います。
+</p>
+
+<p>一覧を変更してエディタを終了すると、コマンドが一旦ストップします。
+
+<pre>
+$ git rebase -i HEAD~3
+Stopped at 29c716a... ハンドラの追加
+You can amend the commit now, with
+
+        git commit --amend
+
+Once you are satisfied with your changes, run
+
+        git rebase --continue
+</pre>
+</p>
+
+<p>さきほど、editを指定したコミットの状態となっているので、ここで誤りの修正を行い、
+git commit --amend でコミットをしなおします。
+
+<pre>
+(誤りを修正)
+$ git commit --amend
+</pre>
+</p>
+
+<p>再コミットしたら、git rebase が示していたように git rebase --continue することで残りのコミットを行います。
+git rebase -i では過去のコミットを修正して、残りのコミットの変更を適用しなおしていることになり、
+図で表すと以下のようになります。
+
+<div class="fig">
+<img src="chap03-2.files/image009.png" />
+<p>図3.8　過去のコミットの修正（git rebase -i）</p>
+</div>
+
+</p>
+
+<p>過去のコミットを変更すると、残りのコミットを適用しなおすときに変更内容がかぶってしまうことがあります。
+これを衝突（CONFLICT）といい、git rebase --continue が一旦ストップするので、手で修正を行います。
+</p>
+
+<pre>
+$ git rebase --continue
+error: could not apply 880ef4c... 333
+hint: after resolving the conflicts, mark the corrected paths
+hint: with 'git add &lt;paths&gt;' and run 'git rebase --continue'
+Could not apply 880ef4c... 333
+
+$ git status
+# Not currently on any branch.
+# Unmerged paths:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#   (use "git add/rm &lt;file&gt;..." as appropriate to mark resolution)
+#
+#       both modified:      src/minitable/Handler.java
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+
+<p>「both modified」で表示されているのが衝突しているファイルで、修正したら git add して
+再度 git rebase --continue を行います。Successfullyと表示されたら完了です。
+
+<pre>
+$ git rebase --continue
+[detached HEAD 1ed3ee9] …
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+Successfully rebased and updated refs/heads/master.
+</pre>
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-2-4" />
+<h3>3.2.4　履歴に名前をつける</h3>
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+こないだ、デモ版作ったバージョンはタグってのをつけとくとええで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+タグってなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+コミットにつける名前みたいなもんかな。<br/>
+リリースとかしたときのファイルの時点は、コミットIDが分かればええんやけど、あのハッシュ文字は覚えられんやろ？
+</div>
+
+<div>
+<b>ぱいん　</b>
+確かに、あれは覚えられそうにないです。。
+</div>
+
+<div>
+<b>ナス　　</b>
+せやから、分かりやすい名前で識別できるようにすんねん。
+<pre>
+$ git tag DEMO_V1_1 81b6baf8
+$ git tag -l -n1
+DEMO_V1_1       keyの存在確認メソッド追加
+</pre>
+これで、81b6baf8 のファイルを参照したいときは DEMO_V1_1っていう名前で参照できるようになるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+それは分かりやすいですね♪<br/>
+デモ以降の変更を見たいときは、こんなカンジかな。。
+<pre>
+$ git diff DEMO_V1_1..HEAD
+diff --git a/src/minitable/MiniTable.java b/src/minitable/MiniTable.java
+index e33a3fc..9a33614 100644
+--- a/src/minitable/MiniTable.java
++++ b/src/minitable/MiniTable.java
+   :
+</pre>
+あ、できたできた♪
+</div>
+
+<div>
+<b>ナス　　</b>
+お、そうやそうや。
+さっそく使いこなしてるやんけ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+えへへ。
+</div>
+
+<div>
+<b>ナス　　</b>
+タグは名前つけるだけやよって、いらんなったらすぐ消してええしな。
+<pre>
+$ git tag -d DEMO_V1_1
+Deleted tag 'DEMO_V1_1'
+</pre>
+
+タグを指定して、そのときのファイルを見たい場合はタグを指定してチェックアウトするんや。
+<pre>
+$ git checkout DEMO_V1_1
+Note: moving to "DEMO_V1_1" which isn't a local branch
+If you want to create a new branch from this checkout, you may do so
+(now or later) by using -b with the checkout command again. Example:
+ git checkout -b &lt;new_branch_name&gt;
+HEAD is now at 81b6baf8... keyの存在確認メソッド追加
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+何かメッセージが表示されてますね。
+</div>
+
+<div>
+<b>ナス　　</b>
+これは、タグ指定でチェックアウトした場合は、どこのブランチにもいないってことやねん。
+ブランチはまだ説明してへんけど、変更の系統のことで、変更を登録するときは、必ずどこかの系統に対して登録することになってるよって、
+タグで参照してる場合はどこの系統にも属してないから、このままではコミットとかはできへんってことやな。
+<pre>
+$ git checkout master
+</pre>
+
+ってやれば、最新の状態に戻せるで。masterってのはデフォルトの系統 (ブランチ)のことやねん。
+こっから先はブランチ使うようになってからにしよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+タグでチェックアウトするときは、タグのファイルを参照するときだけなんですね。
+</div>
+
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="420" src="chap03-2.files/image011.png" />
+</div>
+
+
+<p>gitのコミットはハッシュのランダムな文字列で表されるので、これを覚えておくのは困難です。
+たとえば、リリースしたバージョンが分かるように印をつけたいときに、コミットにタグという名前をつけることができます。
+</p>
+
+<pre>
+git tag &lt;タグ名&gt; &lt;コミット&gt;
+</pre>
+
+<p>タグをつけておくと、過去のあるバージョン以降の変更を確認するときなどに便利です。
+
+<pre>
+$ git tag RELEASE_V1 1ed3ee94
+$ git -l -n
+RELEASE_V1  リリース版
+  ：
+$ git diff RELEASE_V1..HEAD
+</pre>
+</p>
+
+<p>タグをつけた時点のファイルを参照する場合はgit checkoutで取得することができます。
+<pre>
+$ git checkout RELEASE_V1
+</pre>
+</p>
+
+<p>ただし、タグはある時点のファイルを切り出しただけなので、これに変更を加えてもコミットすることはできません。
+過去のある時点から修正を行うには後述のブランチというものを使います。
+</p>
+
+<p>タグをチェックアウトした状態から元に戻るには、以下のコマンドを実行します。
+
+<pre>
+$ git checkout master
+</pre>
+</p>
+
+<p>git tag のオプションについては「6章」を参照してください。
+</p>
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-2-5" />
+<h3>3.2.5　割り込み作業をする</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+(あ、これバグだなぁ。今、別の変更中だけど、一緒に修正しちゃおうかなぁでも、コミットはひとつの変更にした方がいいし。。)
+</div>
+
+<div>
+<b>ナス　　</b>
+ぱいんちゃん、どしたんや？何か顔怖いで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+怖いって失礼ですよ～。<br/>
+今、変更途中に別のバグを見つけちゃって、一緒に直しちゃおうかどうか考えてたんですよぉ。
+</div>
+
+<div>
+<b>ナス　　</b>
+あ、そういうことなら、便利な機能あるで。
+一時的に今の編集状態を退避させとくことができるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+うーん、どういうことだろ？
+</div>
+
+<div>
+<b>ナス　　</b>
+まぁ、やってみよか。<br/>
+今の編集状態を退避するには git stash ってコマンド使うんや。
+<pre>
+$ git stash
+Saved working directory and index state "WIP on master: e5a00cb... setメソッドの追加"
+HEAD is now at e5a00cb setメソッドの追加
+(To restore them type "git stash apply")
+</pre>
+
+これで、編集途中の状態が stashってところに退避されて、作業ツリーは直前のコミットの状態になんねん。
+<pre>
+$ git status
+# On branch master
+nothing to commit (working directory clean)
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+えええ、変更したファイルが消えちゃったんですかぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+大丈夫。退避した状態は git stash list で確認できるで。
+<pre>
+$ git stash list
+stash@{0}: WIP on master: e5a00cb... setメソッドの追加
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+この stash@{0}というのが、編集状態なのかしら？
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。<br/>
+で、今の状態は変更が何もない状態やから、ここで別のバグ修正して、変更をコミットすればええんや。
+
+<pre>
+$ (edit)
+$ git add -u
+$ git commit
+</pre>
+
+割り込みの作業が終わったら、退避してた編集状態を元に戻すで。
+<pre>
+$ git stash apply
+Auto-merging src/minitable/MiniTable.java
+# On branch master
+# Changed but not updated:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+あ、MiniTable.javaに変更があるってなってますね。<br/>
+これが、私の変更したファイルなのかな。。git diff と。。
+おお～、ちゃんと元に戻ってます！
+</div>
+
+<div>
+<b>ナス　　</b>
+これで、元の作業が続けられるやろ？
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい♪これは便利ですねぇ。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="429" src="chap03-2.files/image013.png" />
+</div>
+
+
+<p>コードの変更中にビルドを依頼されたり、別のバグを発見するなど、割り込みの作業が発生したときは git stash が便利です。
+git stash は作業領域の変更内容を stash 領域に一時的に退避させ、また作業領域に復帰させることができます。
+
+<pre>
+git stash                     # 変更を退避
+git stash apply [stash名]     # 退避した変更を復帰
+</pre>
+</p>
+
+<p>変更中に見つけた小さなバグを、割り込みで修正、コミットするには以下のようにします。
+
+<pre>
+$ git stash    # 現在の作業領域の変更を退避
+Saved working directory and index state WIP on master: 1a16861 444
+HEAD is now at 1a16861 444
+
+$ git status   # 作業領域の変更がなくなっているのを確認
+
+$ git stash list              # 退避した変更リスト
+stash@{0}: WIP on master: 1a16861 444
+
+$ git stash show stash@{0}    # stashの内容を確認
+
+(バグを修正)
+$ git add -u
+$ git commit
+
+$ git stash apply   # 退避した変更を復帰
+</pre>
+</p>
+
+<p>作業中に見つけた小さなバグなどは、そのまままとめてコミットしてしまうことがあります。
+しかし、１つの変更でコミットを整理しておくと、よりバージョン管理が有効に利用できるので、
+そんなときに git stash は便利です。
+</p>
+
+<p>git stash はオプションなしで変更内容を退避しますが、以下のようにメッセージを指定して退避することもできます。
+メッセージをつけておくと一覧表示で分かりやすくなります。
+
+<pre>
+$ git stash save for_fix_bug
+Saved working directory and index state On master: for_fix_bug
+HEAD is now at 1a16861 444
+
+$ git stash list
+stash@{0}: On master: for_fix_bug
+</pre>
+</p>
+
+<p>不要になった stash は git stash drop で削除します。
+復帰時に git stash pop を使うと apply 後に自動で削除します。
+</p>
+
+<pre>
+$ git stash drop stash@{0}
+</pre>
+</p>
+
+<p>git stash のオプションについては「6章」を参照してください。
+</p>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c3-2-6" />
+<h3>3.2.6　パッチを適用する</h3>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+今回はパッチの適用をやってみよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+お、今日も突然ですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+パッチいうのは、前に git diff のところで説明したけど、diff のテキストイメージのことやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+確か、そうでしたね。
+</div>
+
+<div>
+<b>ナス　　</b>
+git では、このパッチのファイルを読み込んで、変更を適用する方法があんねん。
+というわけで、さっき、メールでパッチ送ったよって、見てみて。
+</div>
+
+<div>
+<b>ぱいん　</b>
+ええ、いつの間に！？<br/>
+メール受信と。。あ、ほんとだ。
+</div>
+
+<div>
+<b>ナス　　</b>
+添付のテキストファイルを保存してな。<br/>
+ちなみに、パッチの作り方は git diff のイメージをテキストファイルに保存すればええんや。
+<pre>
+$ git diff &gt; patch.txt
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+パッチのファイル、保存しました。
+</div>
+
+<div>
+<b>ナス　　</b>
+ほな、パッチの適用をやってみよか。git apply いうコマンド使うで。
+<pre>
+$ git apply patch.txt
+</pre>
+</div>
+
+<div>
+<b>ぱいん　</b>
+何も表示されませんね。できてるのかな？<br/>
+git status。。と。あ、ファイルが変更されてますね。
+<pre>
+$ git status
+# On branch master
+# Changed but not updated:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#       modified:   src/minitable/MiniTable.java
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+あとは、これをコミットすればOKや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。<br/>
+でも、これって何のために使うんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ほんまは、git は分散管理できるよって、メンバがそれぞれリポジトリ作って変更をやりとりするのがええんやけどな。<br/>
+たとえば、オープンソースのツールで、利用者がバグを見つけて、修正したものを開発者に送れば、
+開発者は git apply使って変更を取り込めるやろ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そういう使い方があるのかぁ。
+</div>
+
+<div>
+<b>ナス　　</b>
+もともと git はオープンソースの管理者が自分で使うのに必要なツールとして作ったもんやからな。<br/>
+他にも、今回みたいに git の連携機能を使ってない環境で、さくっと変更のやりとりにも便利やしな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+出張とかの出先から送るのもいいかもしれないですね。
+LANはつながらないけど、メールは送れるっていう状況はよくありそう。
+</div>
+
+<div>
+<b>ナス　　</b>
+そんなに働かさんといてぇな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+えへへ。
+</div>
+
+</div>
+
+
+<div class="fig">
+<img width="566" height="420" src="chap03-2.files/image015.png" />
+</div>
+
+
+<p>git はパッチという差分ファイルから変更を取り込むことができまます。
+パッチというのは diff コマンドの出力イメージをファイルに保存したもので、git apply コマンドでこれを取り込みます。
+
+<pre>
+git apply &lt;パッチファイル&gt;
+</pre>
+</p>
+
+<p>通常の開発では git のリポジトリ連携の機能を使うので、ファイルから変更を取り込むことはあまりありませんが、
+オープンソースプロジェクトなどでは、一般のユーザーからバグレポートとしてパッチを送ってもらい、
+変更を適用することがあります。
+</p>
+
+<p>パッチを作成するには diff コマンドで以下のようにします。
+minitable.origは変更前のソース、minitableは変更後のソースです。
+
+<pre>
+$ diff -urN minitable.orig/ minitable/ &gt; patch.txt
+</pre>
+</p>
+
+<p>パッチファイルを作成したら、git のリポジトリに反映します。
+
+<pre>
+$ cd minitable/      # gitで管理しているソース
+$ git apply patch.txt
+</pre>
+</p>
+
+<p>これで作業領域のファイルに変更が反映された状態になっているので、git add してコミットします。
+
+<pre>
+$ git add -u
+$ git commit
+</pre>
+</p>
+
+<p>git apply のオプションについては「6章」を参照してください。
+</p>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mbp="http://www.mobipocket.com/mbp" xml:lang="ja" lang="ja">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+<title>5.　Gitの仕組み</title>
+<style type="text/css">
+</style>
+</head>
+
+
+<body>
+
+
+<a name="c5" />
+<h1>5.　Gitの仕組み</h1>
+
+
+<p>これまで git のコマンドの使い方を学んできましたが、ここでは git 内部の仕組みについて説明します。
+git がどのような仕組みでバージョン管理を行っているかを知ることで、より深く git を理解することができます。
+</p>
+
+
+<a name="c5-1" />
+<h2>5.1　オブジェクト</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+コミットのIDって、なんでこんな暗号みたいな文字列なんですかねぇ。
+履歴だったらバージョン 1、2、みたいにつければ分かりやすいのに。
+</div>
+
+<div>
+<b>ナス　　</b>
+ああ、それはコミット情報から生成してるハッシュの値なんや。<br/>
+git は管理情報をオブジェクトで管理してて、ハッシュはオブジェクトの名前にもなってるねん。
+ちょうどええから、git の中身について説明しよか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+難しそうだけど、大丈夫かな。。
+</div>
+
+<div>
+<b>ナス　　</b>
+git の情報はリポジトリに格納されてるんやけど、それらの情報は「オブジェクト」という単位で管理されてる、
+つまり、オブジェクトDBやな。<br/>
+オブジェクトにはいくつか種類あるけど、それはあとで説明するで。
+で、そのオブジェクトから生成したハッシュが、そのままオブジェクトの名前になってるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+オブジェクトからハッシュを生成？そもそもハッシュって何なのかしら？
+</div>
+
+<div>
+<b>ナス　　</b>
+ハッシュは任意のバイト列、ファイルの中身などから、固定長のランダムなバイト列(文字列)を作ることで、
+このバイト列を作る処理をハッシュ関数っていうんやけど、
+git では SHA-1 というアルゴリズムで作ったバイト列から 16進の 40桁の文字列を作ってるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なんだか複雑ですね。わざわざハッシュを使う理由があるんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+ええ、質問や！
+まず、ハッシュにはこんな特徴があんねん。
+
+<ul>
+<li>入力が違えば(ファイルの内容が違うなど)、異なるハッシュ値を生成 ※</li>
+<li>入力の内容に関わらず、ばらばらのハッシュ値が作られる(似た文字列にならない)</li>
+<li>ハッシュ値から、入力の内容が推定できない</li>
+</ul>
+
+<blockquote>※完全ではないが、ハッシュ値が重複する可能性が限りなく低い
+ハッシュ値が重複しないことを「暗号的に安全」という
+</blockquote>
+
+つまり、ファイルの内容などの入力に対して一意の文字列を作れるから、オブジェクト名として使ることができる。<br/>
+他にも、オブジェクト名としてハッシュを使ってると、こんなメリットがあるで。
+
+<ul>
+<li>ハッシュ値を比較するだけで、ファイルの内容などが同じかチェックできる</li>
+<li>オブジェクトの内容から生成したハッシュ値と、オブジェクト名を比較することで、オブジェクトが正常かをチェックできる</li>
+</ul>
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど！<br/>
+ファイルの比較が速くなれば、ツールの処理も速くできそうですね。
+diff とか比較の処理がたくさんありそうですし。
+</div>
+
+<div>
+<b>ナス　　</b>
+そのとおりや。<br/>
+このオブジェクトDBの仕組みが、git を高速なソースコード管理ツールにしてるんやな。
+ほな、オブジェクトの使われ方も見ていくで～。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はーい。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+
+<p>git はオブジェクトDBによって、ファイル構成やバージョンを管理しています。
+</p>
+
+<p>オブジェクトには次の４種類があります。
+</p>
+
+<dl>
+<dt>blob</dt>
+<dd>ファイルの内容を格納しているオブジェクト</dd>
+<dt>tree</dt>
+<dd>ディレクトリのツリー構成の情報を格納しているオブジェクト</dd>
+<dt>commit</dt>
+<dd>変更履歴の情報を格納しているオブジェクト</dd>
+<dt>tag</dt>
+<dd>タグの情報を格納しているオブジェクト</dd>
+</dl>
+
+<p>オブジェクトはそれぞれファイルになっており、先頭の種別とサイズ情報から、
+読み込んだオブジェクトが何のオブジェクトか識別することができます。
+なお、オブジェクトのファイルは .git/objects/ 以下に格納されています。
+</p>
+
+
+<div class="fig">
+<img width="566" height="257" src="chap05.files/image002.jpg" />
+<p>図5.1　git のオブジェクト</p>
+</div>
+
+
+<p>最初の blob と tree オブジェクトは、ファイル構成を表します。
+たとえば、次のようなファイルツリーを管理しているとします。
+
+<pre>
+  proj/
+    |
+    +-- README
+    +-- src/
+          MiniTable.java
+</pre>
+</p>
+
+<p>これを、オブジェクトで表すと以下のようになります。
+</p>
+
+
+<div class="fig">
+<img width="567" height="304" src="chap05.files/image004.jpg" />
+<p>図5.2　ファイルツリーをオブジェクトで表現</p>
+</div>
+
+
+<p>ここで、READMEファイルの内容を変更したとすると、オブジェクトは以下のようになります。
+</p>
+
+
+<div class="fig">
+<img width="566" height="306" src="chap05.files/image006.jpg" />
+<p>図5.3　ファイルを変更した場合</p>
+</div>
+
+
+<p>つまり、ファイルツリーの先頭の tree オブジェクトが分かれば、その時点のファイルツリーが参照できるのです。
+commit オブジェクトでは、それぞれの時点の先頭の tree オブジェクトを参照することで、履歴を管理しています。
+</p>
+
+
+<div class="fig">
+<img width="566" height="328" src="chap05.files/image008.jpg" />
+<p>図5.4　コミットオブジェクトから参照</p>
+</div>
+
+
+<p>git のオブジェクトの大まかな構成はこのようになります。
+これから分かるように、git ではそれぞれの変更時点のファイルツリーのスナップショットを管理しています。
+</p>
+
+<p>Subversionなど、他ののツールでは、あるコミットと次のコミット差分をデータベースに保存することで管理しているのに対し、
+大きく異なる特徴で、git を理解する上で重要な概念といえます。
+</p>
+
+<p>以降では、実際にオブジェクトをたどりながら、各オブジェクトについて詳しく見ていきます。
+</p>
+
+
+<h4>commit オブジェクト</h4>
+
+<p>commit オブジェクトは、以下の情報を格納し、その時点のファイルツリーをたどれるようになっています。
+</p>
+
+<dl>
+<dt>parent</dt>
+<dd>親コミット(変更元のコミット)への参照</dd>
+<dt>tree</dt>
+<dd>コミット時点のファイルツリーを表す tree オブジェクトへの参照</dd>
+<dt>author</dt>
+<dd>変更した人(および、変更日時)</dd>
+<dt>committer</dt>
+<dd>コミットした人(および、コミット日時)</dd>
+<dt>comment</dt>
+<dd>コメント</dd>
+</dl>
+
+
+<div class="fig">
+<img width="220" height="207" src="chap05.files/image010.jpg" />
+<p>図5.5　commit オブジェクト</p>
+</div>
+
+
+<p>オブジェクト名はオブジェクトの内容に対して一意であることは説明しました。
+commit オブジェクトについては、上記の項目についてコミットが一意であるということがいえます。
+</p>
+
+<p>commit オブジェクトの内容は、以下のコマンドで参照することができます。
+
+<pre>
+$ git show -s --pretty=raw
+commit 0462d17959348e751479fcc509ef38a819cc9708
+tree 72f415ba34eec43610b9e749c3d2682f676e5632
+parent a3ccff3d4a7ddd6888b24e45710cf1a6727c3cb9
+author pine@example.com 1256642869 +0900
+committer pine@example.com 1256642869 +0900
+
+    READMEの内容修正
+</pre>
+</p>
+
+<p>コミットの履歴は parent のオブジェクトをたどることで参照できます。
+
+<pre>
+$ git show -s --pretty=raw a3ccff3d
+</pre>
+</p>
+
+<p>parent はひとつ前の変更元となるコミットへの参照を持っています。
+マージコミットの場合は parent が複数になることもあります。
+</p>
+
+<p>また、parent がないコミットは一番最初のコミットで、"root" コミットと呼ばれます。
+author は変更した人、committer はコミットした人を表し、それぞれの処理日時と一緒に格納されます。
+これらは、通常は同じ人になりますが、たとえば、メールで送付されたパッチを、別の管理者がコミットした場合は、
+author はメールの送信者(変更した人)、committer は管理者のように異なる人になることもあります。
+</p>
+
+
+<h4>tree オブジェクト</h4>
+
+<p>tree オブジェクトはディレクトリに対応するオブジェクトで、blob オブジェクトや、
+サブディレクトリの tree オブジェクトへの参照の一覧を持っています。
+</p>
+
+
+<div class="fig">
+<img width="210" height="204" src="chap05.files/image012.jpg" />
+<p>図5.6　tree オブジェクト</p>
+</div>
+
+
+<p>tree オブジェクトの内容は git show でも参照することができますが、
+git ls-tree で、より詳細な情報をみることができます。
+
+<pre>
+$ git show 72f415ba
+tree 72f415ba34eec43610b9e749c3d2682f676e5632
+
+README
+src/
+
+$ git ls-tree 72f415ba
+100644 blob e2098de98c3508e023a24c71db8bb8a4aeacf7d4    README
+040000 tree bf3924abd86cbfd91569c6becf4db63cb282ba3a    src
+
+$ git ls-tree bf3924ab
+100644 blob b284b7ddf4d1ce9fb7d22584862e1d313a252db4    MiniTable.java
+</pre>
+</p>
+
+<p>リストの各エントリには blob、tree の別と、オブジェクトへの参照(SHA-1)、ファイル、ディレクトリ名、
+およびファイルモードが格納されています。ファイルのモードには以下の値が設定されています。
+
+<pre>
+040000　　ディレクトリ
+100644　　通常のファイル
+100755　　実行可能なファイル
+</pre>
+</p>
+
+<p>ファイルのモードは 644と 755の２種類しかありません(通常、UNIXでは細かくモードを設定可能)。
+これは、git はファイルが実行可能かどうかのみを判定しているためです。
+</p>
+
+<p>なお、ディレクトリ配下にファイルやディレクトリがない場合は tree オブジェクトを作ることができないため、
+git は空のディレクトリを持つことができません。
+ログの出力先や、一時ファイルの保存用のディレクトリ(log/、tmp/など)を git のツリーに含めたい場合は、
+.gitignore ファイルを置くなどして登録します。
+
+<pre>
+$ mkdir log/
+$ echo "*.log" > log/.gitignore    # *.log は git status で無視される
+$ git add log/.gitignore
+$ git commit
+</pre>
+</p>
+
+
+<h4>blob オブジェクト</h4>
+
+<p>blob オブジェクトは、通常のファイルを格納しています。
+</p>
+
+
+<div class="fig">
+<img width="221" height="215" src="chap05.files/image014.jpg" />
+<p>図5.7　blob オブジェクト</p>
+</div>
+
+
+<p>git show コマンドで見ると、以下のようにファイルの内容がそのまま表示されます。
+
+<pre>
+$ git show b284b7dd...
+  :
+public class MiniTable {
+    public MiniTable() {
+    }
+
+    public Object get(String key) {
+        :
+</pre>
+</p>
+
+<p>blob オブジェクトはファイルの内容に対して一意になるため、
+異なるディレクトリにあるファイルの内容がまったく同じであれば、blob オブジェクトは共有されます。
+</p>
+
+<p>また、複数のコミット間でファイルが変更されていない場合も、blob オブジェクトは共有されます。
+なお、blob オブジェクトはファイル名の情報は持っていないため、ファイル名が変更されても同じオブジェクトになります。
+(ファイル名を変更した場合は、そのファイルを格納するディレクトリに対する tree オブジェクトが変更されます)
+</p>
+
+
+<h4>tag オブジェクト</h4>
+
+<p>tag オブジェクトはタグを表すオブジェクトで、タグ付けされたコミットへの参照などを格納しています。
+</p>
+
+<dl>
+<dt>object</dt>
+<dd>タグ付けされたオブジェクトへの参照(通常は commitオブジェクト)</dd>
+<dt>type</dt>
+<dd>タグ付けされたオブジェクトの種別(通常は commit)</dd>
+<dt>tagger</dt>
+<dd>タグ付けした人(および、タグの作成日)</dd>
+<dt>message</dt>
+<dd>コメント</dd>
+</dl>
+
+
+<div class="fig">
+<img width="218" height="206" src="chap05.files/image016.jpg" />
+<p>図5.8　tag オブジェクト</p>
+</div>
+
+
+<p>タグはある時点のコミットに対して、名前をつけるものなので、tag オブジェクトは通常、
+commit オブジェクトへの参照を格納しています。
+git show コマンドで見ると、コミットの情報を参照していることが分かります。
+
+<pre>
+$ git tag -l
+v1.0.1
+
+$ git show -s --pretty=raw v1.0.1
+tag v1.0.1
+Tagger: pine &lt;pine@example.com&gt;
+Date:   Wed Oct 27 20:47:41 2009 +0900
+
+Ver. 1.0.1
+commit 0462d17959348e751479fcc509ef38a819cc9708
+tree 72f415ba34eec43610b9e749c3d2682f676e5632
+parent a3ccff3d4a7ddd6888b24e45710cf1a6727c3cb9
+author pine &lt;pine@example.com&gt; 1256642869 +0900
+committer pine &lt;pine@example.com&gt; 1256642869 +0900
+
+    1.0.1 リリースノート追加
+</pre>
+</p>
+
+<p>git cat-file コマンドで、もう少しシンプルに表示することもできます。
+
+<pre>
+$ git cat-file tag v1.0.1
+object 0462d17959348e751479fcc509ef38a819cc9708
+type commit
+tag v1.0.1
+tagger pine &lt;pine@example.com&gt; 1257335261 +0900
+
+Ver. 1.0.1
+</pre>
+</p>
+
+<p>git cat-file コマンドは -t オプションで SHA-1からオブジェクトの種類を調べることができ、
+commit オブジェクトや、blob オブジェクトを表示することもできます。
+
+<pre>
+$ git cat-file -t 0462d179      # オブジェクトの種類を調べる -&gt; commit オブジェクト
+commit
+
+$ git cat-file -t 72f415ba      # オブジェクトの種類を調べる -&gt; tree オブジェクト
+tree
+
+$ git cat-file -t e2098de9      # オブジェクトの種類を調べる -&gt; blob オブジェクト
+blob
+
+
+$ git cat-file commit 0462d179  # commit オブジェクトを表示
+tree 72f415ba34eec43610b9e749c3d2682f676e5632
+parent a3ccff3d4a7ddd6888b24e45710cf1a6727c3cb9
+author pine &lt;pine@example.com&gt; 1256642869 +0900
+committer pine &lt;pine@example.com&gt; 1256642869 +0900
+
+  READMEの修正
+
+$ git cat-file blob e2098de9    # blob オブジェクトを表示
+  :
+public class MiniTable {
+
+</pre>
+</p>
+
+<p>なお、タグの作成時にメッセージをつけない場合は、タグは単なるコミットへの参照となり、
+tag オブジェクトは作られません。
+これを「軽量タグ」といい、tag オブジェクトが作られるタグは「注釈タグ」といわれます。
+タグの参照は、次の節で説明する refs で設定されます。
+</p>
+
+
+<div class="fig">
+<img src="chap05.files/image017.png" />
+<p>図5.9　「軽量タグ」と「注釈付きタグ」の参照</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c5-2" />
+<h2>5.2　参照</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+commit オブジェクトは、その時点のツリーを参照できて、さらに parent から親のコミットもたどれるんですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう、commit オブジェクトひとつから、変更履歴の歴史をたどれるってわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+でも、parent で過去にさかのぼって参照はできるけど、最新のコミットってどうやって見つけるのかな？
+バージョンの番号と違って、ハッシュだと順番はランダムだし。。
+</div>
+
+<div>
+<b>ナス　　</b>
+ええとこに気づいたな。<br/>
+実は、git は最新のコミット、HEADっていうんやけど、これを別に管理してるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+HEADってよく出てきますよね。
+</div>
+
+<div>
+<b>ナス　　</b>
+git の参照情報は .git/refs/ 以下にある。<br/>
+ここで、ブランチごとの最新のコミットへの参照を格納してて、
+たとえば.git/refs/heads/master ファイルに、master ブランチの最新コミットのハッシュが書かれてるんや。
+
+<pre>
+$ cat .git/refs/heads/master
+99a0b4b07514dd26e5c055dc80b6309782d9cb14
+</pre>
+
+refs から最新のコミットを見つけて、それを起点にコミットの系統をたどってるってことやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そっかぁ。なるほど～<br/>
+.git/refs/heads/ の下には、それぞれのブランチ名のファイルがありますね。ここから、各ブランチの系統をたどれるってことなんだぁ。
+
+<pre>
+$ ls .git/refs/heads/
+add_logger    master    test_branch1    ...
+</pre>
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。<br/>
+他にも、現在のブランチの先頭を HEAD って参照するけど、あれも参照ファイルがあって、
+.git/HEAD ってファイルに、どのブランチを参照するか書かれてるで。<br/>
+たとえば、現在のブランチが master なら、こんな風になるな。
+
+<pre>
+$ cat .git/HEAD
+ref: refs/heads/master
+</pre>
+
+ここで、現在のブランチを特定して、refs からそのブランチの最新のコミットを見つけるってことやな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+よくできてるなぁ。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>git はコミットなど、あらゆる情報をオブジェクトDBに格納します。
+</p>
+
+<p>オブジェクトDB内のオブジェクト名は、SHA-1によるハッシュで表されるため、
+そのままではどのオブジェクトを参照すればいいのか、分からなくなってしまいます。
+そこで、オブジェクトの参照の起点となるキーとして、refs という参照情報を別に管理しています。
+</p>
+
+<p>refs の情報はリポジトリの .git/refs/ 以下に格納されていて、次のような情報を持っています。
+</p>
+
+<dl>
+<dt>ブランチの最新コミット(HEAD)</dt>
+<dd>― .git/refs/heads/${ブランチ名}</dd>
+<dt>タグ情報</dt>
+<dd>― .git/refs/tags/${タグ名}</dd>
+<dt>リモートブランチのコミット</dt>
+<dd>― .git/refs/remotes/${リモートブランチ名}</dd>
+</dl>
+
+<p>.git/refs/heads/ には、ブランチ名のファイルがあり、それぞれのブランチの最新のコミットのハッシュがかかれています。
+このハッシュを元に、オブジェクトDBから最新コミットの commit オブジェクトを検索し、コミットの履歴をたどることができます。
+
+<pre>
+$ cat .git/refs/heads/master
+0462d17959348e751479fcc509ef38a819cc9708
+
+$ git cat-file -t 0462d179
+commit
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="198" src="chap05.files/image019.jpg" />
+<p>図5.10　オブジェクトDBのブランチの履歴をたどる</p>
+</div>
+
+
+<p>また、.git/refs/tags/ には、タグ名のファイルがあり、タグをつけたコミットを参照できるようになっています。
+ただし、refs のタグのファイルには commit オブジェクトのハッシュと、tag オブジェクトのハッシュのものがあります。
+</p>
+
+<p>commit オブジェクトのハッシュが書かれているものは、tag オブジェクトが作られないタグで「軽量タグ」と呼ばれています。
+軽量タグには、タグのメッセージなどの情報はなく、単にコミットへ名前をつけたものとなります。
+</p>
+
+<p>一方、tag オブジェクトのハッシュが書かれているものは、tag オブジェクトが作られるタグで「注釈付きタグ」と呼ばれます。
+こちらは、タグのメッセージなどの情報を持っていて、tag オブジェクトから commit オブジェクトを参照するようになります。
+
+<pre>
+$ ls .git/refs/tags/
+v1.0.1   preview20091027
+
+$ cat .git/refs/tags/v1.0.1
+bbe6e5602f2645c71d5edf853890d29d5667ba10
+$ git cat-file -t bbe6e560    # tag オブジェクトが作られるタグ
+tag
+
+$ cat .git/refs/tags/preview20091027
+9e7688b699762bcf6baf2caab4660fe55f74794c
+$ git cat-file -t 9e7688b6    # tag オブジェクトが作られないタグ
+commit
+</pre>
+</p>
+
+
+<div class="fig">
+<img width="566" height="196" src="chap05.files/image021.jpg" />
+<p>図5.11　オブジェクトDBのタグを参照</p>
+</div>
+
+
+<p>.git/refs/remotes/ には、通常のブランチと同様に、リモートブランチの最新コミットのハッシュが書かれています。
+参照情報には .git/refs/ の他に .git/HEAD があります。.git/HEAD には、現在のブランチの参照が書かれています。
+
+<pre>
+$ cat .git/HEAD
+ref: refs/heads/master
+
+$ git branch    # HEADの参照先ブランチが、現在のブランチ
+* master
+    :
+</pre>
+</p>
+
+<p>なお、.git/HEADにはブランチへの参照の他に、直接 commit オブジェクトのハッシュが設定されることがあります。
+たとえば、タグやリモートブランチをチェックアウトした場合などが該当します。
+</p>
+
+<h5>タグをチェックアウトした場合</h5>
+
+<pre>
+$ git checkout v1.0.1    # タグをチェックアウト
+Note: moving to "v1.0.1" which isn't a local branch
+If you want to create a new branch from this checkout, you may do so
+(now or later) by using -b with the checkout command again. Example:
+  git checkout -b &lt;new_branch_name&gt;
+HEAD is now at 0462d17... V1.0.1リリース
+
+$ git branch    # 現在、どこのブランチにもいない状態になる
+* (no branch)
+  master
+
+$ cat .git/refs/tags/v1.0.1
+bbe6e5602f2645c71d5edf853890d29d5667ba10
+$ git cat-file -t bbe6e560
+tag
+$ git cat-file tag bbe6e560
+object 0462d17959348e751479fcc509ef38a819cc9708  # タグが参照するコミット
+type commit
+tag v1.0.1
+tagger pine &lt;pine@example.com&gt; 1257335261 +0900
+    :
+
+$ cat .git/HEAD
+0462d17959348e751479fcc509ef38a819cc9708
+$ git cat-file -t 0462d179    # HEADは直接、タグが参照する commit オブジェクトを参照
+commit
+</pre>
+
+
+<h5>リモートブランチをチェックアウトした場合</h5>
+
+<pre>
+$ git branch -r
+  origin/HEAD
+  origin/master
+$ git checkout origin/master    # リモートブランチをチェックアウト
+Previous HEAD position was 0462d17... ...
+HEAD is now at a3ccff3... ...
+$ git branch                    # 現在、どこのブランチにもいない状態
+* (no branch)
+  master
+
+$ cat .git/refs/remotes/origin/master
+a3ccff3d4a7ddd6888b24e45710cf1a6727c3cb9
+
+$ git cat-file -t a3ccff3d      # リモートブランチの commit オブジェクト
+commit
+
+$ cat .git/HEAD                 # HEADは直接、リモートブランチの commit オブジェクトを参照
+a3ccff3d4a7ddd6888b24e45710cf1a6727c3cb9
+</pre>
+
+<p>.git/HEADの参照先を変更することによって、ブランチの切り替えを行い、
+また、現在いるブランチを特定してコミットなどの対象としています。
+どこのブランチにもいなければ、コミットはできなくなります。
+</p>
+
+<p>また、git reset によるコミットの取り消しなども、参照先を変更するだけで実現できます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="335" src="chap05.files/image023.jpg" />
+<p>図5.12　参照を変更してコミット取り消しを実現</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c5-3" />
+<h2>5.3　作業ツリー、インデックス</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ナス　　</b>
+オブジェクトDBの参照の仕方が分かったから、あとは作業ツリーとインデックスも見とこか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+そうですね。
+</div>
+
+<div>
+<b>ナス　　</b>
+作業ツリーは単にオブジェクトを、実際のファイルツリーに展開したもんや。<br/>
+commit オブジェクトがプロジェクトのトップディレクトリの tree オブジェクトを参照しとるよって、それを起点にディレクトリ、ファイルに戻すってわけや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+なるほど。オブジェクトのままだと編集やビルドもできませんものね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そうそう。それに tree や blob オブジェクトは圧縮もされてるしな。
+</div>
+
+<div>
+<b>ぱいん　</b>
+インデックスはどういう仕組みなんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+インデックスも commit オブジェクトと同じように、ひとつのファイルツリーを持ってるんや。<br/>
+それで、オブジェクトDB―インデックス間、インデックス―作業ツリー間で、ファイルツリーを比較したり、
+変更することで git の機能を実現しているってわけ。
+</div>
+
+<div>
+<b>ぱいん　</b>
+インデックスもひとつのファイルツリーなんですね♪
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>git のオブジェクトDBから、ある時点のファイルツリーを展開したものが作業ツリーです。
+</p>
+
+<p>commit オブジェクトから、プロジェクトのトップディレクトリの tree オブジェクトをたどれるので、
+これを起点にしてファイルに展開します
+</p>
+
+
+<div class="fig">
+<img width="566" height="275" src="chap05.files/image025.jpg" />
+<p>図5.13　オブジェクトからファイルツリーへの展開</p>
+</div>
+
+
+<p>インデックスもひとつのファイルツリーを構成していて、.git/index というファイルに格納されています。
+git ls-files コマンドで内容を確認することができます。
+
+<pre>
+$ git ls-files --stage
+100644 e2098de98c3508e023a24c71db8bb8a4aeacf7d4 0       README
+100644 59c5d9eba66fbb32a7b586508229043d516291e9 0       VERSION
+100644 156b8368bf6fe448d4699443a517392656ea711f 0       src/MiniTable.java
+100644 6f627b15b9b0134bb67754a86b6960fdac588811 0       src/Handler.java
+  :
+</pre>
+</p>
+
+<p>インデックスは tree オブジェクトのように階層構造になっているのではなく、
+ひとつの完全なファイルリストとなっており、ファイルのモード、ハッシュ(blob オブジェクト)、パスなどの情報を持っています。
+</p>
+
+<p>このように、オブジェクトDB、インデックス、作業ツリーでそれぞれのファイルツリーを持ち、
+２つのツリー間で比較、変更することで git の機能を実現します。
+</p>
+
+<p>たとえばツリーを比較すれば、次のように git status による状態表示の各項目を検出することができます。
+</p>
+
+<dl>
+<dt>Changes to be committed:</dt>
+<dd>オブジェクトDBのツリー(最新コミットからたどれるツリー)と、インデックスを比較</dd>
+<dt>Changed but not updated:</dt>
+<dd>インデックスのツリーと作業ツリーを比較 (インデックスにあるファイル)</dd>
+<dt>Untracked files:</dt>
+<dd>インデックスのツリーと作業ツリーを比較 (インデックスにないファイル)</dd>
+</dl>
+
+
+<div class="fig">
+<img width="566" height="290" src="chap05.files/image027.jpg" />
+<p>図5.14　オブジェクトDB、インデックス、作業ツリー間の比較</p>
+</div>
+
+
+<p>また、git add で作業ツリーでの変更を登録すると、インデックスツリーのハッシュが変更されます。
+
+<pre>
+$ git ls-files --stage
+100644 e2098de98c3508e023a24c71db8bb8a4aeacf7d4 0       README
+    :
+
+(edit)
+$ git add ...
+
+$ git ls-files --stage
+100644 59c5d9eba66fbb32a7b586508229043d516291e9 0       README    # ハッシュが変更される
+    :
+</pre>
+</p>
+
+<p>git commit を実行すると、インデックスのファイルツリーを元に、
+新しい tree オブジェクトが作られ、オブジェクトDBに格納されます。
+インデックスには一連の tree オブジェクトを構成するのに必要なすべての情報が保存されています。
+</p>
+
+<p>逆に、git checkout コマンドで、オブジェクトから作業ツリーへのチェックアウトを行った場合、
+まずチェックアウトするブランチの最新コミットのツリーから、インデックスのツリーを更新します。
+</p>
+
+<p>次にインデックスのツリーから、作業ツリーへのファイルの展開が行われます。
+</p>
+
+
+<div class="fig">
+<img width="566" height="292" src="chap05.files/image029.jpg" />
+<p>図5.15　オブジェクトDB、インデックス、作業ツリー間のデータの流れ</p>
+</div>
+
+
+
+
+<mbp:pagebreak />
+
+<a name="c5-4" />
+<h2>5.4　遊離オブジェクト</h2>
+
+
+<div class="story">
+
+<div>――開発部</div>
+
+<div>
+<b>ぱいん　</b>
+インデックスってハッシュのリストになってましたよね。<br/>
+あれはオブジェクト作られるんですか？
+</div>
+
+<div>
+<b>ナス　　</b>
+そうやで、一時的にオブジェクト作られるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+git add しなおしたときにリストのハッシュが変更されるけど、あれは新しくオブジェクトを作ってるってことなんですよね。<br/>
+じゃあ、前のハッシュのオブジェクトはどうなっちゃうんだろ？
+</div>
+
+<div>
+<b>ナス　　</b>
+残ってるで。
+</div>
+
+<div>
+<b>ぱいん　</b>
+え、そうなんですか！？<br/>
+でも、もう使われないオブジェクトってことですよね。
+</div>
+
+<div>
+<b>ナス　　</b>
+そういう、どこからも参照されなくなったオブジェクトを dangling オブジェクト(遊離オブジェクト)っていうんや。<br/>
+通常はもう要らんオブジェクトやから、消してしもてもええんやけど、git の操作ミスで参照がたどれなくなったときとか、ファイルが壊れてしもたときの復旧とかに使われることもあるんや。
+</div>
+
+<div>
+<b>ぱいん　</b>
+一見、要らないものでも、もしものときに役に立つかもしれないんですね♪
+</div>
+
+<div>
+<b>ナス　　</b>
+そういうことや。<br/>
+git のメンテナンス用のコマンドもあるから、ちょっと説明しとこか。
+</div>
+
+<div>
+<b>ぱいん　</b>
+はい。
+</div>
+
+<div>　</div>
+
+</div>
+
+
+<p>オブジェクトDB上のオブジェクトは、ブランチの headやタグから参照される commitオブジェクトを起点に順に参照されます。
+</p>
+
+<p>しかし、git を使っていくうちにどこからも参照されない宙ぶらりんなオブジェクトができてしまいます。
+このようなオブジェクトを dangling オブジェクト(遊離オブジェクト)といい、以下のような操作によって発生します。
+</p>
+
+<ul>
+<li>git reset でコミットの取り消しを行ったとき</li>
+<li>ブランチを削除したとき</li>
+<li>git add でインデックスに登録しなおしたとき</li>
+</ul>
+
+
+<div class="fig">
+<img width="566" height="420" src="chap05.files/image031.jpg" />
+<img width="462" height="272" src="chap05.files/image033.jpg" />
+<p>図5.16　dangling オブジェクトが発生する例</p>
+</div>
+
+
+<p>たとえば、git resetでコミットを取り消した場合に、HEADが以前に指していた commit オブジェクトを調べるには、
+git reflog コマンドなどが使えます。
+
+<pre>
+$ git reflog
+1fa05a6... HEAD@{0}: commit: データの上書き更新の対応        # 変更を整理して再コミット
+af09d1e... HEAD@{1}: HEAD~3: updating HEAD                   # コミットを取り消し(HEAD~3)
+eab4040... HEAD@{2}: checkout: moving from master to dev_1   # 開発用ブランチをチェックアウト
+  :
+</pre>
+</p>
+
+<p>例では、開発用ブランチのコミットを一旦取り消して、変更を整理して再コミットしている操作のログを示しています。
+</p>
+
+<p>コミット整理後の HEAD は 1fa05a6 で、整理前の古い HEAD は eab4040 (dev_1をチェックアウト直後の HEAD)
+だったことが分かります。
+ただし、reflog はデフォルトでは定期的に削除されるので、reflog がない場合は git fsck コマンドを使います。
+
+<pre>
+$ git fsck
+dangling commit a84266382d5c2405b039f35d79ebacc6e7a21dd5
+dangling blob e7c26ce6d2cb4d6043201733bce165eb29de0440
+dangling tree 0403b68f90cca800c82ba7c4e6adee0d00cc42fe
+dangling tree c10364ce0e1c4b6d54159bca4dd6e0f6a9ff4e88
+dangling commit 5d54753da9983be8018476e66427a91ad6e5ba2a
+dangling commit eab4040caa66b6c3a78e018a3d7aed6b4c54f9aa
+    :
+</pre>
+</p>
+
+<p>git fsck はオブジェクトDBを検査し、dangling オブジェクトなどの種別とハッシュのリストを表示します。
+先の例の古い HEAD の参照を調べるには、commit オブジェクトのハッシュを git show コマンドで確認して探すことができます。
+
+<pre>
+$ git show eab4040caa66b6c3a78e018a3d7aed6b4c54f9aa
+commit eab4040caa66b6c3a78e018a3d7aed6b4c54f9aa
+Author: pine &lt;pine@example.com&gt;
+Date:   Thu Nov 1 12:00:00 2009 +0900
+       :
+</pre>
+</p>
+
+<p>git fsck はそのままでは reflog から参照されているオブジェクトは検出できないので、
+reflog が存在する状態で git fsck を使って dangling オブジェクトを探す場合は --no-reflogs オプションをつけます。
+
+<pre>
+$ git fsck --no-reflogs
+</pre>
+</p>
+
+<p>git reflog や git fsck で古い HEAD の commit オブジェクトを発見したら、
+以下のように古い commit を参照するブランチを作って復旧することができます。
+
+<pre>
+$ git branch recovered_dev_1 eab4040    # ハッシュを指定して、復旧用のブランチを作成
+</pre>
+</p>
+
+<p>なお、git fsck は dangling 以外にもなんらかの理由で失われてしまったファイルなども検出することができます。
+オブジェクトが紛失されている場合は、コピーのリポジトリなどから復旧します。
+以下の例では 072b21c のオブジェクトは .git/objects/07/2b21c8df3dea2ab87d43d484b53ea73926bb8b
+として格納されているので、コピーのリポジトリから該当のオブジェクトのファイルをコピーします。
+
+<pre>
+$ git fsck
+missing blob 072b21c8df3dea2ab87d43d484b53ea73926bb8b    # 参照されているが存在しない blobオブジェクト
+    :
+
+# 他のリポジトリから .git/objects/07/2b21c8df3dea2ab87d43d484b53ea73926bb8b をコピーしてくる
+$ mkdir .git/objects/07
+$ mv 2b21c8df3dea2ab87d43d484b53ea73926bb8b .git/objects/07/
+</pre>
+</p>
+
+<p>通常、dangling オブジェクトは復旧時に役に立つので残しておいても問題はありませんが、
+プロジェクトの規模が大きくなり、また長く運用をしているとディスクを圧迫し、git のパフォーマンスにも影響してきます。
+そのような場合には、オブジェクトDBから不要なオブジェクトを削除し、
+適切に情報を圧縮してくれる git gc というコマンドがあります。
+
+<pre>
+$ git gc
+</pre>
+</p>
+
+
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="uuid_id">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+  <dc:title>Gitではじめるバージョン管理</dc:title>
+  <dc:language>ja</dc:language>
+  <dc:creator opf:role="aut">川端 崇裕</dc:creator>
+  <dc:identifier opf:scheme="uuid" id="uuid_id">b6b3b610-eaa8-4271-8a1e-fbf1c34216a2</dc:identifier>
+  <meta name="cover" content="cover-image" />
+</metadata>
+<manifest>
+  <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+  <item id="cover-image" href="cover.png" media-type="image/png" />
+  <item id="stylesheet" href="stylesheet.css" media-type="text/css" />
+  <item id="title" href="title.xhtml" media-type="application/xhtml+xml" />
+  <item id="toc" href="toc.xhtml" media-type="application/xhtml+xml" />
+  <item id="item1" href="chap01.xhtml" media-type="application/xhtml+xml" />
+  <item id="item2" href="chap02.xhtml" media-type="application/xhtml+xml" />
+  <item id="item3-1" href="chap03-1.xhtml" media-type="application/xhtml+xml" />
+  <item id="item3-2" href="chap03-2.xhtml" media-type="application/xhtml+xml" />
+  <item id="item3-3" href="chap03-3.xhtml" media-type="application/xhtml+xml" />
+  <item id="item3-4" href="chap03-4.xhtml" media-type="application/xhtml+xml" />
+  <item id="item4" href="chap04.xhtml" media-type="application/xhtml+xml" />
+  <item id="item5" href="chap05.xhtml" media-type="application/xhtml+xml" />
+  <item id="item6" href="chap06.xhtml" media-type="application/xhtml+xml" />
+  <item id="item7" href="chap07.xhtml" media-type="application/xhtml+xml" />
+</manifest>
+<spine toc="ncx">
+  <itemref idref="title" />
+  <itemref idref="toc" />
+  <itemref idref="item1" />
+  <itemref idref="item2" />
+  <itemref idref="item3-1" />
+  <itemref idref="item3-2" />
+  <itemref idref="item3-3" />
+  <itemref idref="item3-4" />
+  <itemref idref="item4" />
+  <itemref idref="item5" />
+  <itemref idref="item6" />
+  <itemref idref="item7" />
+</spine>
+<tours></tours>
+<guide>
+  <reference type="cover" title="表紙" href="title.xhtml" />
+  <reference type="toc" title="目次" href="toc.xhtml" />
+  <reference type="start" title="バージョン管理の概要" href="chap01.xhtml" />
+</guide>
+</package>

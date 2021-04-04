@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+  <head>
+    <meta name="dtb:uid" content="gitbook06282007214712"/>
+    <meta name="dtb:depth" content="1"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+
+  <docTitle>
+    <text>Gitではじめるバージョン管理</text>
+  </docTitle>
+  <docAuthor>
+    <text>川端 崇裕</text>
+  </docAuthor>
+
+  <navMap>
+    <navPoint id="title" playOrder="1">
+      <navLabel><text>表紙</text></navLabel><content src="title.xhtml" />
+    </navPoint>
+    <navPoint id="toc" playOrder="2">
+      <navLabel><text>目次</text></navLabel><content src="toc.xhtml" />
+    </navPoint>
+    <navPoint id="chap01" playOrder="3">
+      <navLabel><text>1. バージョン管理の概要</text></navLabel><content src="chap01.xhtml#c1"/>
+    </navPoint>
+    <navPoint id="chap02" playOrder="4">
+      <navLabel><text>2. Gitの導入</text></navLabel><content src="chap02.xhtml#c2"/>
+    </navPoint>
+    <navPoint id="chap03" playOrder="5">
+      <navLabel><text>3. Gitの使い方</text></navLabel><content src="chap03-1.xhtml#c3"/>
+    </navPoint>
+    <navPoint id="chap03-1" playOrder="6">
+      <navLabel><text>3.1 Gitの基本的な使い方</text></navLabel><content src="chap03-1.xhtml#c3-1"/>
+    </navPoint>
+    <navPoint id="chap03-2" playOrder="7">
+      <navLabel><text>3.2 ちょっと高度な使い方</text></navLabel><content src="chap03-2.xhtml#c3-2"/>
+    </navPoint>
+    <navPoint id="chap03-3" playOrder="8">
+      <navLabel><text>3.3 グループで共同作業</text></navLabel><content src="chap03-3.xhtml#c3-3"/>
+    </navPoint>
+    <navPoint id="chap03-4" playOrder="9">
+      <navLabel><text>3.4 ブランチで並列作業</text></navLabel><content src="chap03-4.xhtml#c3-4"/>
+    </navPoint>
+    <navPoint id="chap04" playOrder="10">
+      <navLabel><text>4. GitとSubversion</text></navLabel><content src="chap04.xhtml#c4"/>
+    </navPoint>
+    <navPoint id="chap05" playOrder="11">
+      <navLabel><text>5. Gitの仕組み</text></navLabel><content src="chap05.xhtml#c5"/>
+    </navPoint>
+    <navPoint id="chap06" playOrder="12">
+      <navLabel><text>6. コマンドリファレンス</text></navLabel><content src="chap06.xhtml#c6"/>
+    </navPoint>
+    <navPoint id="chap07" playOrder="13">
+      <navLabel><text>7. GitHub</text></navLabel><content src="chap07.xhtml#c7"/>
+    </navPoint>
+  </navMap>
+</ncx>
